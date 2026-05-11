@@ -62,7 +62,8 @@ class Eveent_Assets_Manager
 
         wp_register_script('ev-guestbook-lite-handler', plugins_url('assets/js/ev-guestbook-lite-handler.js', dirname(__FILE__)), ['jquery', 'elementor-frontend'], $version, true);
 
-        wp_register_script('ev-card-atm-handler', plugins_url('assets/js/ev-card-atm-handler.js', dirname(__FILE__)), ['jquery', 'sweetalert2-js'], $version, true);
+        wp_register_script('image-compress-lib', 'https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js', [], '2.0.2', true);
+        wp_register_script('ev-card-atm-handler', plugins_url('assets/js/ev-card-atm-handler.js', dirname(__FILE__)), ['jquery', 'sweetalert2-js', 'image-compress-lib'], $version, true);
 
      
         wp_register_script('ev-privacy-handler', plugins_url('assets/js/ev-privacy-handler.js', dirname(__FILE__)), ['jquery'], $version, true);
