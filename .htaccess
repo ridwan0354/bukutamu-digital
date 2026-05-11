@@ -1,0 +1,30 @@
+Options -Indexes
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.*)$ $1.php [L]
+
+<Files "tables.php">
+    Order deny,allow
+    Deny from all
+</Files>
+<Files "koneksi.php">
+    Order deny,allow
+    Deny from all
+</Files>
+<Files "security_hardening_plan.md">
+    Order deny,allow
+    Deny from all
+</Files>
+<Files "*.sql">
+    Order deny,allow
+    Deny from all
+</Files>
+<Files "*.log">
+    Order deny,allow
+    Deny from all
+</Files>
+<Files "*.disabled">
+    Order deny,allow
+    Deny from all
+</Files>

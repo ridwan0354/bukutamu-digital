@@ -1,0 +1,470 @@
+.ewf-flip-card-container {
+    perspective: 1000px;
+    max-width: 100%;
+    min-height: 250px;
+}
+
+.ewf-flip-card-container.ewf-flip-enabled {
+    cursor: pointer;
+}
+
+.ewf-flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.8s;
+    transform-style: preserve-3d;
+    transform: translate3d(0, 0, 0);
+}
+
+.ewf-flip-card-inner.is-flipped {
+    transform: rotateY(180deg) translate3d(0, 0, 0);
+}
+
+.ewf-card-front,
+.ewf-card-back {
+    background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden; 
+    backface-visibility: hidden;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+    padding: 20px 25px;
+    transform: translateZ(1px);
+}
+
+.ewf-card-back {
+    transform: rotateY(180deg);
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transform: rotateY(180deg) translateZ(1px);
+   
+}
+
+
+
+
+.ewf-card-back-image img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 15px;
+}
+
+.ewf-card-back-title {
+    margin: 0 0 10px 0;
+}
+
+.ewf-card-back-description {
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+.ewf-copy-button {
+    cursor: pointer;
+    z-index: 5;
+    font-size: 12px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    text-decoration: none;
+    transition: all .3s;
+}
+
+
+.ewf-card-number-area .ewf-copy-button {
+    margin-left: 15px;
+}
+
+.ewf-copy-button:hover {
+    opacity: 0.8;
+}
+
+
+.ewf-atm-card {
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    max-width: 100%;
+    box-sizing: border-box;
+    height: 100%;
+}
+
+.ewf-atm-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.2);
+}
+
+.ewf-card-header,
+.ewf-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.ewf-card-body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.ewf-card-logo img {
+    max-width: 100%;
+    height: auto;
+}
+
+.ewf-card-chip {
+    margin-bottom: 10px;
+}
+
+.ewf-card-number-area {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.ewf-card-number-label {
+    font-size: 0.7em;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.ewf-card-footer-label {
+    font-size: 0.6em;
+    letter-spacing: 1px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.ewf-card-footer-right {
+    text-align: right;
+}
+
+
+.ewf-card-emboss .ewf-card-number,
+.ewf-card-emboss .ewf-card-footer-value,
+.ewf-card-emboss .ewf-card-title {
+    text-shadow: 0 1px 1px rgba(0,0,0,0.3);
+}
+
+
+.ewf-logo-align-left .ewf-card-header {
+    flex-direction: row-reverse;
+}
+
+.ewf-logo-align-right .ewf-card-header {
+    flex-direction: row;
+}
+
+
+@media (max-width: 600px) {
+    .swal2-popup {
+        box-sizing: border-box !important;
+        max-width: 95% !important;
+        width: auto !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    .swal2-title,
+    .swal2-html-container {
+        overflow-wrap: break-word;
+    }
+
+    .swal2-image {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+}
+
+.swal2-title {
+    font-size: 14px;
+}
+
+.swal2-html-container {
+    font-size: 12px;
+}
+
+
+.ewf-card-title {
+    flex-grow: 1;
+    margin-right: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+
+.ewf-logo-align-left .ewf-card-title {
+    margin-right: 0;
+    margin-left: 15px;
+}
+
+.ewf-card-logo {
+    flex-shrink: 0;
+}
+
+
+/* ========================================================== */
+/* STYLING KHUSUS MODE QR (ewf-qr-active) - FIX TATA LETAK & ORDER */
+/* ========================================================== */
+
+
+.ewf-qr-active .ewf-card-header,
+.ewf-qr-active .ewf-card-chip {
+    display: none !important;
+}
+
+
+.ewf-qr-active .ewf-card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; 
+    align-items: stretch; 
+    flex-grow: 1;
+    padding: 0;
+    height: 100%;
+}
+
+
+.ewf-qr-active .ewf-card-main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    text-align: center;
+    width: 100%;
+    margin: 0;
+    flex-grow: 1;
+    justify-content: space-between; 
+    padding: 5px; 
+}
+
+
+.ewf-qr-content-top {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+
+.ewf-qr-content-bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-top: 5px; 
+    flex-shrink: 0;
+}
+
+
+.ewf-qr-active .ewf-qr-footer-inline {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 5px; 
+}
+
+.ewf-qr-active .ewf-card-footer-left {
+    text-align: center;
+    width: 100%;
+}
+.ewf-qr-active .ewf-card-footer-right {
+    display: none !important; 
+}
+
+
+.ewf-qr-buttons-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+
+.ewf-qr-active > .ewf-card-footer {
+    display: none !important; 
+}
+
+
+.ewf-qr-code-area {
+    margin-top: 15px; 
+    margin-bottom: 0;
+    flex-shrink: 0;
+}
+
+.ewf-qr-image {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    width: 100px;
+    height: 100px;
+    margin-bottom: 0;
+    background-color: white;
+    padding: 2px;
+    border-radius: 15px !important;
+}
+
+
+.ewf-atm-card-widget-wrapper.ewf-qr-active .ewf-flip-card-container {
+    min-height: 420px !important;
+}
+.ewf-atm-card-widget-wrapper.ewf-qr-active .ewf-card-front,
+.ewf-atm-card-widget-wrapper.ewf-qr-active .ewf-card-back {
+    height: 100% !important;
+}
+
+
+
+.ewf-qr-label-above {
+    text-align: center;
+    margin-bottom: 0; 
+    margin-top: 0;
+    padding: 8px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 100%;
+    align-self: center; 
+}
+
+.ewf-qr-label-title {
+    font-size: 12px;
+    font-weight: bold;
+    margin: 0 0 5px 0;
+    color: inherit;
+}
+
+.ewf-qr-label-instruction {
+    font-size: 10px;
+    line-height: 1.2;
+    margin: 0;
+    opacity: 0.8;
+    white-space: pre-wrap;
+}
+
+
+
+
+.elementor-widget-ev-atm-card.ewf-none .ewf-qr-label-above {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #212529;
+}
+.elementor-widget-ev-atm-card.ewf-none .ewf-qr-label-title {
+    color: #212529;
+}
+
+
+.elementor-widget-ev-atm-card.ewf-skin-dark .ewf-qr-label-above {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #FFFFFF;
+}
+.elementor-widget-ev-atm-card.ewf-skin-dark .ewf-qr-label-title {
+    color: #FFFFFF;
+    text-shadow: none;
+}
+.elementor-widget-ev-atm-card.ewf-skin-dark .ewf-qr-label-instruction {
+    color: #AAAAAA;
+    opacity: 1;
+}
+
+
+.elementor-widget-ev-atm-card.ewf-skin-gold .ewf-qr-label-above {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #FBDB93;
+}
+.elementor-widget-ev-atm-card.ewf-skin-gold .ewf-qr-label-title {
+    color: #FFFFFF;
+    text-shadow: none;
+}
+.elementor-widget-ev-atm-card.ewf-skin-gold .ewf-qr-label-instruction {
+    color: #FBDB93;
+    opacity: 1;
+}
+
+
+.elementor-widget-ev-atm-card.ewf-skin-light .ewf-qr-label-above {
+    background-color: rgba(0, 0, 0, 0.08);
+    color: #1A1A1A;
+}
+.elementor-widget-ev-atm-card.ewf-skin-light .ewf-qr-label-title {
+    color: #1A1A1A;
+}
+
+
+/* ========================================================== */
+
+
+/* Base & "None" (Gaya Kustom) Skin */
+.elementor-widget-ev-atm-card.ewf-none .ewf-card-front, .elementor-widget-ev-atm-card.ewf-none .ewf-card-back { background: #f8f9fa; border: 1px solid #dee2e6; color: #212529; }
+.elementor-widget-ev-atm-card.ewf-none .ewf-card-title, .elementor-widget-ev-atm-card.ewf-none .ewf-card-number-label, .elementor-widget-ev-atm-card.ewf-none .ewf-card-footer-label { color: #6c757d; }
+.elementor-widget-ev-atm-card.ewf-none .ewf-card-number, .elementor-widget-ev-atm-card.ewf-none .ewf-card-footer-value { color: #212529; }
+.elementor-widget-ev-atm-card.ewf-none .ewf-card-chip i, .elementor-widget-ev-atm-card.ewf-none .ewf-card-chip svg { color: #CFAB8D; fill: #CFAB8D; }
+.elementor-widget-ev-atm-card.ewf-none .ewf-copy-button { background-color: #f1f3f5; color: #495057; border: 1px solid #ced4da; }
+.elementor-widget-ev-atm-card.ewf-none .ewf-copy-button:hover { background-color: #e9ecef; color: #212529; }
+
+
+/* Modern Dark Skin */
+.elementor-widget-ev-atm-card.ewf-skin-dark .ewf-card-front, .elementor-widget-ev-atm-card.ewf-skin-dark .ewf-card-back { background: linear-gradient(135deg, #434343 0%, #000000 100%); color: #EAEAEA; border: 1px solid #555; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); }
+.elementor-widget-ev-atm-card.ewf-skin-dark .ewf-card-title, .elementor-widget-ev-atm-card.ewf-skin-dark .ewf-card-number, .elementor-widget-ev-atm-card.ewf-skin-dark .ewf-card-footer-value { color: #ffffff; }
+.elementor-widget-ev-atm-card.ewf-skin-dark .ewf-card-number-label, .elementor-widget-ev-atm-card.ewf-skin-dark .ewf-card-footer-label { color: #aaa; }
+.elementor-widget-ev-atm-card.ewf-skin-dark .ewf-card-chip i, .elementor-widget-ev-atm-card.ewf-skin-dark .ewf-card-chip svg { color: #FFFFFF; fill: #FFFFFF; }
+.elementor-widget-ev-atm-card.ewf-skin-dark .ewf-copy-button { background-color: rgba(255, 255, 255, 0.1); color: #FFFFFF; border-color: rgba(255, 255, 255, 0.2); }
+.elementor-widget-ev-atm-card.ewf-skin-dark .ewf-copy-button:hover { background-color: rgba(255, 255, 255, 0.2); }
+
+
+/* Classic Gold Skin */
+.elementor-widget-ev-atm-card.ewf-skin-gold .ewf-card-front, .elementor-widget-ev-atm-card.ewf-skin-gold .ewf-card-back { background: linear-gradient(135deg, #1d2b3a 0%, #0f171e 100%); color: #E0B64C; border: none; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5); }
+.elementor-widget-ev-atm-card.ewf-skin-gold .ewf-card-title, .elementor-widget-ev-atm-card.ewf-skin-gold .ewf-card-number, .elementor-widget-ev-atm-card.ewf-skin-gold .ewf-card-footer-value { color: #FFFFFF; }
+.elementor-widget-ev-atm-card.ewf-skin-gold .ewf-card-number-label, .elementor-widget-ev-atm-card.ewf-skin-gold .ewf-card-footer-label { color: #aaa; }
+.elementor-widget-ev-atm-card.ewf-skin-gold .ewf-card-number { color: #FBDB93; }
+.elementor-widget-ev-atm-card.ewf-skin-gold .ewf-card-chip i, .elementor-widget-ev-atm-card.ewf-skin-gold .ewf-card-chip svg { color: #FBDB93; fill: #FBDB93; }
+.elementor-widget-ev-atm-card.ewf-skin-gold .ewf-copy-button { background-color: #FBDB93 !important; color: #000000 !important; border: none; }
+.elementor-widget-ev-atm-card.ewf-skin-gold .ewf-copy-button:hover { background-color: #E0B64C !important; }
+
+/* Light Minimalist Skin */
+.elementor-widget-ev-atm-card.ewf-skin-light .ewf-card-front, .elementor-widget-ev-atm-card.ewf-skin-light .ewf-card-back { background: linear-gradient(135deg, #EAEAEA 0%, #D7D7D7 100%); color: #1A1A1A; border: none; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); }
+.elementor-widget-ev-atm-card.ewf-skin-light .ewf-card-title, .elementor-widget-ev-atm-card.ewf-skin-light .ewf-card-number, .elementor-widget-ev-atm-card.ewf-skin-light .ewf-card-footer-value { color: #1A1A1A; }
+.elementor-widget-ev-atm-card.ewf-skin-light .ewf-card-number-label, .elementor-widget-ev-atm-card.ewf-skin-light .ewf-card-footer-label { color: #888888; }
+.elementor-widget-ev-atm-card.ewf-skin-light .ewf-card-chip i, .elementor-widget-ev-atm-card.ewf-skin-light .ewf-card-chip svg { color: #888888; fill: #888888; }
+.elementor-widget-ev-atm-card.ewf-skin-light .ewf-copy-button { background-color: #1A1A1A; color: #FFFFFF; border: none; }
+.elementor-widget-ev-atm-card.ewf-skin-light .ewf-copy-button:hover { background-color: #444444; }
+
+
+.ewf-confirm-gift-button-wrapper { text-align: center; margin-top: 15px; }
+.ewf-confirm-gift-button { display: inline-block; font-weight: 600; cursor: pointer; border: 1px solid #ccc; padding: 10px 20px; border-radius: 5px; background-color: #f0f0f0; color: #333; transition: all 0.3s ease; }
+.ewf-confirm-gift-button:hover { background-color: #e0e0e0; }
+
+.ewf-gift-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+.ewf-gift-modal { background-color: #fff; padding: 25px; border-radius: 8px; width: 90%; max-width: 450px; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+.ewf-gift-modal-close { position: absolute; top: 10px; right: 15px; font-size: 24px; line-height: 1; border: none; background: transparent; cursor: pointer; color: #888; }
+.ewf-atm-card-widget-wrapper { max-width: 450px; }
+.ewf-atm-card-widget-wrapper { height: auto !important; }
+.ewf-swal-top-index { z-index: 99999 !important; }
+.swal2-popup.ewf-atm-card-popup { background: linear-gradient(145deg, #FCF9F5, #FBF8F4) ; border-radius: 20px !important; border: none; padding: 2.5em !important; font-family: 'Helvetica Neue', Arial, sans-serif; box-shadow: 0 10px 60px rgba(0, 0, 0, 0.08) ; max-width: 480px !important; }
+.swal2-popup.ewf-atm-card-popup { text-align: left; }
+.swal2-popup.ewf-atm-card-popup .swal2-icon { margin: 0 0 1.2em 0 !important; width: 100% !important; border: none !important; display: block !important; }
+.swal2-popup.ewf-atm-card-popup .swal2-icon-html { width: 100%; margin: 0; }
+.swal2-popup.ewf-atm-card-popup .swal2-title { color: #3D332A ; font-size: 25px ; font-weight: 700; margin-bottom: 0.5em ; padding: 0 !important; text-align: left; }
+.swal2-popup.ewf-atm-card-popup .swal2-html-container { color: #7A6C62 ; font-size: 15px; line-height: 1.6; margin-bottom: 2em ; text-align: left; padding: 0 !important; }
+.swal2-popup.ewf-atm-card-popup .swal2-html-container b { font-weight: bold; font-size: calc(1em + 5px); }
+.swal2-popup.ewf-atm-card-popup .swal2-actions { width: 100%; justify-content: flex-start ; margin-top: 1em ; }
+.swal2-popup.ewf-atm-card-popup .swal2-deny { background: #C9B7A9 ; color: #FFFFFF ; border-radius: 12px ; font-weight: 600; padding: 12px 28px; font-size: 15px; border: none; box-shadow: 0 4px 15px rgba(195, 169, 149, 0.4); transition: all 0.3s ease; }
+.swal2-popup.ewf-atm-card-popup .swal2-deny:hover { background: #b7a393 ; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(195, 169, 149, 0.5); }
+.ewf-gift-modal .ev-rsvp-form input.is-prefilled { background-color: #f0f0f0; cursor: not-allowed; opacity: 0.9; }

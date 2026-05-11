@@ -1,0 +1,321 @@
+
+.ev-settings-container {
+    display: flex;
+    margin-top: 20px;
+    background: #f0f2f5;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.ev-tabs-nav {
+    width: 250px;
+    background-color: #fff;
+    border-right: 1px solid #e5e5e5;
+    padding: 20px 0;
+}
+.ev-tabs-nav ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.ev-tabs-nav a {
+    display: block;
+    padding: 15px 20px;
+    text-decoration: none;
+    color: #555d66;
+    font-size: 15px;
+    font-weight: 500;
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+.ev-tabs-nav a.active,
+.ev-tabs-nav a:hover {
+    color: #007cba;
+    background-color: #f7f9fb;
+    border-left-color: #007cba;
+}
+.ev-tab-content-container {
+    flex-grow: 1;
+    padding: 30px;
+    background: #fff;
+}
+.ev-tab-content {
+    display: none;
+}
+.ev-tab-content.active {
+    display: block;
+}
+h2.ev-tab-title {
+    margin: 0 0 20px;
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+.ev-alert {
+    padding: 18px 20px;
+    border-radius: 6px;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 15px;
+    line-height: 1.5;
+}
+.ev-alert.success {
+    background-color: #e1f7e7;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+.ev-alert.error {
+    background-color: #fdf0f0;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+.ev-alert svg {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+}
+.ev-status-text {
+    font-weight: 600;
+    font-size: 17px;
+}
+.ev-license-details p {
+    margin: 8px 0;
+    color: #666;
+}
+.ev-license-details strong {
+    font-weight: 700;
+    color: #333;
+}
+.ev-deactivate-btn,
+.ev-settings-form input[type="submit"] {
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-shadow: none;
+    box-shadow: none;
+}
+.ev-deactivate-btn {
+    background-color: #e0e0e0;
+    color: #555;
+    border: 1px solid #ccc;
+    margin-top: 20px;
+}
+.ev-deactivate-btn:hover {
+    background-color: #c0c0c0;
+}
+.ev-settings-form input[type="submit"] {
+    background-color: #007cba;
+    border: none;
+    color: #fff;
+}
+.ev-settings-form input[type="submit"]:hover {
+    background-color: #006ba1;
+}
+.form-table th, .form-table td {
+    padding: 15px 10px;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+.form-table th {
+    font-weight: 600;
+}
+.form-table input[type="text"] {
+    max-width: 450px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 15px;
+}
+.form-table .description {
+    margin-top: 5px;
+    font-size: 13px;
+    color: #888;
+}
+.ev-settings-form p.submit {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+
+
+.ev-settings-container {
+    display: flex;
+    margin-top: 20px;
+    background: #f0f2f5;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.ev-tabs-nav {
+    width: 250px;
+    background-color: #fff;
+    border-right: 1px solid #e5e5e5;
+    padding: 20px 0;
+}
+.ev-tabs-nav ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.ev-tabs-nav a {
+    display: block;
+    padding: 15px 20px;
+    text-decoration: none;
+    color: #555d66;
+    font-size: 15px;
+    font-weight: 500;
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+.ev-tabs-nav a.active,
+.ev-tabs-nav a:hover {
+    color: #007cba;
+    background-color: #f7f9fb;
+    border-left-color: #007cba;
+}
+.ev-tab-content-container {
+    flex-grow: 1;
+    padding: 30px;
+    background: #fff;
+}
+.ev-tab-content {
+    display: none;
+}
+.ev-tab-content.active {
+    display: block;
+}
+h2.ev-tab-title {
+    margin: 0 0 20px;
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+.ev-alert {
+    padding: 18px 20px;
+    border-radius: 6px;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 15px;
+    line-height: 1.5;
+}
+.ev-alert.success {
+    background-color: #e1f7e7;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+.ev-alert.error {
+    background-color: #fdf0f0;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+.ev-alert svg {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+}
+.ev-status-text {
+    font-weight: 600;
+    font-size: 17px;
+}
+.ev-license-details p {
+    margin: 8px 0;
+    color: #666;
+}
+.ev-license-details strong {
+    font-weight: 700;
+    color: #333;
+}
+.ev-deactivate-btn,
+.ev-settings-form input[type="submit"] {
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-shadow: none;
+    box-shadow: none;
+}
+.ev-deactivate-btn {
+    background-color: #e0e0e0;
+    color: #555;
+    border: 1px solid #ccc;
+    margin-top: 20px;
+}
+.ev-deactivate-btn:hover {
+    background-color: #c0c0c0;
+}
+.ev-settings-form input[type="submit"] {
+    background-color: #007cba;
+    border: none;
+    color: #fff;
+}
+.ev-settings-form input[type="submit"]:hover {
+    background-color: #006ba1;
+}
+.form-table th, .form-table td {
+    padding: 15px 10px;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+.form-table th {
+    font-weight: 600;
+}
+.form-table input[type="text"] {
+    max-width: 450px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 15px;
+}
+.form-table .description {
+    margin-top: 5px;
+    font-size: 13px;
+    color: #888;
+}
+.ev-settings-form p.submit {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+
+.ev-input-group {
+    display: flex;
+    align-items: center;
+    max-width: 400px;
+}
+
+.ev-input-group input {
+    flex: 1; 
+    border-right: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    margin: 0 !important;
+}
+
+.ev-input-group .ev-input-suffix {
+    padding: 0 10px;
+    height: 28px;
+    line-height: 28px;
+    background-color: #f0f0f1;
+    border: 1px solid #8c8f94;
+    border-left: 0;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    white-space: nowrap; 
+    font-size: 14px;
+    color: #50575e;
+}

@@ -1,0 +1,3 @@
+
+window.EvGlobal = window.EvGlobal || {};
+

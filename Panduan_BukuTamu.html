@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panduan Penggunaan Buku Tamu Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #f3f4f6; 
+            color: #1a0f0d; 
+            line-height: 1.6;
+        }
+        h1, h2, h3, h4 { 
+            font-family: 'Playfair Display', serif; 
+            color: #1a0f0d;
+        }
+        .page-container { 
+            max-width: 850px; 
+            margin: 2rem auto; 
+            background: white; 
+            padding: 4rem 5rem; 
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); 
+            border-radius: 12px; 
+            border-top: 8px solid #87714c;
+        }
+        .section-title {
+            border-bottom: 2px solid #f3e9d8;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            margin-top: 2.5rem;
+            display: flex;
+            align-items: center;
+        }
+        .section-icon {
+            color: #87714c;
+            margin-right: 0.75rem;
+            font-size: 1.25rem;
+            background: #fffbf2;
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: 1px solid #e8e1d5;
+        }
+        ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
+        li { margin-bottom: 0.5rem; }
+        
+        @media print {
+            body { background-color: white; }
+            .page-container { 
+                margin: 0; 
+                padding: 1rem; 
+                box-shadow: none; 
+                max-width: 100%; 
+                border-top: none;
+                border-radius: 0;
+            }
+            .no-print { display: none !important; }
+            .print-break { page-break-before: always; }
+        }
+        
+        .highlight { color: #87714c; font-weight: 700; }
+    </style>
+</head>
+<body>
+
+    <div class="text-center mt-8 no-print">
+        <button onclick="window.print()" class="bg-[#87714c] hover:bg-[#6c5a3b] text-white px-6 py-3 rounded-full font-bold shadow-lg transition duration-300 flex items-center gap-2 mx-auto">
+            <i class="fas fa-print"></i> Simpan sebagai PDF / Print
+        </button>
+        <p class="text-sm text-gray-500 mt-2">Tips: Pada jendela print, pilih "Save as PDF" di pengaturan Destination.</p>
+    </div>
+
+    <div class="page-container">
+        
+        <!-- HEADER -->
+        <div class="text-center mb-10 pb-6 border-b-2 border-[#87714c]">
+            <h1 class="text-4xl font-bold mb-3">Panduan Sistem</h1>
+            <h2 class="text-2xl text-[#87714c] italic">Buku Tamu Digital Eksklusif</h2>
+            <p class="text-sm text-gray-500 mt-4">Dokumen ini menjelaskan fungsi dan tata cara penggunaan fitur-fitur di dalam sistem manajemen tamu.</p>
+        </div>
+
+        <!-- DASHBOARD -->
+        <h3 class="text-2xl font-bold section-title">
+            <i class="fas fa-desktop section-icon"></i> 1. Menu "Dashboard" (Pusat Kendali Hari-H)
+        </h3>
+        <p class="mb-4">Menu <strong>Dashboard</strong> adalah halaman yang paling sering dibuka <strong>pada saat acara berlangsung</strong>. Halaman ini berfungsi sebagai "meja penerima tamu digital" (receptionist).</p>
+        
+        <ul class="mb-4">
+            <li><strong>Filter Event (Pilih Acara):</strong> Di bagian atas (pada gambar cover/foto profil acara), terdapat dropdown untuk memilih acara mana yang sedang berlangsung. Ini berguna jika Anda mengelola lebih dari satu acara sekaligus.</li>
+            <li><strong>Statistik Real-time:</strong> Terdapat 3 kotak informasi yang akan terus update secara otomatis:
+                <ul class="mt-2 mb-2">
+                    <li><span class="highlight">Total Data (Baris):</span> Jumlah total baris tamu yang diundang.</li>
+                    <li><span class="highlight">Estimasi Pax (Orang):</span> Estimasi total jumlah orang yang diharapkan hadir.</li>
+                    <li><span class="highlight">Pax Hadir (Orang):</span> Jumlah orang yang sudah benar-benar datang dan melakukan check-in di lokasi.</li>
+                </ul>
+            </li>
+            <li><strong>Tombol "SCAN" (Kamera QR Code):</strong> 
+                <p class="text-sm text-gray-700 mt-1 mb-2"><strong>Guna:</strong> Untuk melakukan check-in tamu secara otomatis dan kilat menggunakan QR Code yang mereka bawa.<br>
+                <strong>Cara Pakai:</strong> Klik tombol SCAN, arahkan QR Code tamu ke kamera. Sistem akan otomatis mendeteksi nama tamu, mencatat waktu kehadiran mereka secara presisi, dan statusnya di tabel akan berubah menjadi "Hadir".</p>
+            </li>
+            <li><strong>Tombol "LAYAR SAPA" (Monitor Display):</strong>
+                <p class="text-sm text-gray-700 mt-1 mb-2"><strong>Guna:</strong> Menampilkan ucapan "Selamat Datang" kepada tamu di monitor eksternal secara otomatis.<br>
+                <strong>Cara Pakai:</strong> Klik tombol ini, lalu drag/geser tab browser yang baru terbuka ke layar monitor ke-2 (TV/Proyektor), lalu jadikan fullscreen.</p>
+            </li>
+            <li><strong>Kolom "Input Manual" (Check-in Tanpa QR):</strong>
+                <p class="text-sm text-gray-700 mt-1 mb-2"><strong>Guna:</strong> Jika tamu lupa membawa QR Code, atau tamu dadakan, Anda bisa check-in manual.<br>
+                <strong>Cara Pakai:</strong> Ketik nama tamu, lalu tekan tombol Check-in atau Enter. Sistem otomatis menandai tamu tersebut hadir.</p>
+            </li>
+            <li><strong>Tabel Kehadiran Tamu:</strong> Menampilkan daftar siapa saja yang datang. Anda bisa mengedit jumlah Pax secara langsung, me-reset status check-in, atau melakukan check-in manual dengan klik ikon centang hijau.</li>
+        </ul>
+
+        <!-- EVENT -->
+        <h3 class="text-2xl font-bold section-title">
+            <i class="far fa-calendar-alt section-icon"></i> 2. Menu "Event"
+        </h3>
+        <p class="mb-4"><strong>Guna:</strong> Tempat untuk membuat, mengedit, atau menghapus data acara (misal: "Pernikahan Budi & Ani").<br>
+        <strong>Penjelasan:</strong> Di sini Anda mengatur nama acara, tanggal acara, foto cover, logo, serta mengatur template pesan WhatsApp otomatis untuk acara tersebut.</p>
+
+        <!-- DAFTAR TAMU -->
+        <h3 class="text-2xl font-bold section-title">
+            <i class="fas fa-users section-icon"></i> 3. Menu "Daftar Tamu" (Buku Induk Undangan)
+        </h3>
+        <p class="mb-2"><strong>Guna:</strong> Ini adalah tempat Anda bekerja <strong>sebelum acara dimulai</strong> untuk memasukkan daftar nama orang yang diundang.</p>
+        <ul class="mb-4">
+            <li><strong>Tambah & Import Data:</strong> Bisa dilakukan satu per satu atau Import massal via file CSV/Excel.</li>
+            <li><strong>Tombol Kontak & Share:</strong> Klik ikon roda gigi di sebelah nama tamu untuk melihat undangan (preview), copy teks undangan, atau download QR khusus tamu tersebut.</li>
+            <li><strong>Tombol WhatsApp:</strong> Klik logo WA hijau untuk langsung membuka chat WhatsApp ke tamu tersebut beserta template pesan undangannya.</li>
+            <li><strong>Tombol "Sync WA":</strong> Men-sinkronkan seluruh daftar tamu ke antrean Menu "Setting Pesan" agar pesan bisa dikirimkan secara massal (Blast).</li>
+        </ul>
+
+        <div class="print-break"></div>
+
+        <!-- SETTING PESAN -->
+        <h3 class="text-2xl font-bold section-title">
+            <i class="fab fa-whatsapp section-icon"></i> 4. Menu "Setting Pesan" (WhatsApp Broadcast)
+        </h3>
+        <p class="mb-4"><strong>Guna:</strong> Mengelola antrean pengiriman pesan undangan WhatsApp secara otomatis (Auto Blast).<br>
+        <strong>Penjelasan:</strong> Nama tamu yang telah di-Sync akan masuk ke sini dengan status "Pending". Sistem mengirimkan pesan secara bertahap (interval) agar nomor pengirim tidak terblokir. Anda bisa memantau mana yang <em>Sukses</em>, <em>Gagal</em>, dan <em>Pending</em>.</p>
+
+        <!-- QR GENERATOR -->
+        <h3 class="text-2xl font-bold section-title">
+            <i class="fas fa-qrcode section-icon"></i> 5. Menu "QR Generator"
+        </h3>
+        <p class="mb-4"><strong>Guna:</strong> Alat untuk mencetak (print) atau mengunduh QR Code tamu dalam jumlah banyak.<br>
+        <strong>Penjelasan:</strong> Berguna jika Anda menggunakan undangan cetak fisik dan ingin menempelkan stiker QR Code unik pada setiap undangan tamu.</p>
+
+        <!-- UCAPAN & DOA -->
+        <h3 class="text-2xl font-bold section-title">
+            <i class="fas fa-comment-dots section-icon"></i> 6. Menu "Ucapan & Doa"
+        </h3>
+        <p class="mb-4"><strong>Guna:</strong> Memantau pesan dan doa yang dikirimkan oleh tamu melalui halaman website undangan.<br>
+        <strong>Penjelasan:</strong> Admin memiliki kontrol penuh (moderasi) untuk melihat dan menghapus pesan yang tidak pantas dari halaman publik.</p>
+
+        <!-- LAPORAN -->
+        <h3 class="text-2xl font-bold section-title">
+            <i class="fas fa-chart-bar section-icon"></i> 7. Menu "Laporan" (Reporting)
+        </h3>
+        <p class="mb-4"><strong>Guna:</strong> Fitur rekapitulasi pasca-acara.<br>
+        <strong>Penjelasan:</strong> Melihat perbandingan total tamu hadir dan tidak hadir secara keseluruhan. Laporan ini bisa di-export ke dalam bentuk PDF atau Excel untuk diberikan kepada tuan rumah/mempelai sebagai rekap absensi tamu.</p>
+
+        <!-- ADMIN CONTROL -->
+        <h3 class="text-2xl font-bold section-title">
+            <i class="fas fa-shield-alt section-icon"></i> 8. Admin Control (Khusus Administrator)
+        </h3>
+        <p class="mb-2">Bagian ini hanya muncul jika login sebagai pemilik sistem utama:</p>
+        <ul class="mb-8">
+            <li><strong>Kelola Mempelai:</strong> Tempat membuat akun login untuk klien (mempelai) agar mereka bisa memantau dashboard acara mereka sendiri.</li>
+            <li><strong>Settings (Pengaturan):</strong> Konfigurasi dasar sistem seperti nama aplikasi, logo, zona waktu, dan link parameter utama.</li>
+            <li><strong>Panduan Aplikasi:</strong> SOP teknis penggunaan sistem agar staf penerima tamu bisa membacanya sebelum bertugas.</li>
+        </ul>
+
+        <div class="text-center pt-8 border-t border-gray-200 mt-12">
+            <p class="text-xs text-gray-400">Dicetak pada: <span id="printDate"></span></p>
+            <script>document.getElementById('printDate').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });</script>
+        </div>
+
+    </div>
+
+</body>
+</html>

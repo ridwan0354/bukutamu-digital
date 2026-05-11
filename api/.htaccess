@@ -1,0 +1,7 @@
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^guest-details/(.*)$ guest-details.php?id=$1 [QSA,L]
+RewriteRule ^guest-rsvp-status/(.*)$ guest-rsvp-status.php?id=$1 [QSA,L]
+RewriteRule ^track-click/(.*)$ track-click.php?id=$1 [QSA,L]
+RewriteRule ^gifts/?$ gifts.php [QSA,L]
