@@ -8,6 +8,12 @@ require 'koneksi.php';
 
 // 2. Cek & Update Database
 if(mysqli_num_rows(mysqli_query($koneksi,"SHOW COLUMNS FROM tamu LIKE 'is_manual'"))==0){mysqli_query($koneksi,"ALTER TABLE tamu ADD COLUMN is_manual TINYINT(1) DEFAULT 0");}
+if(mysqli_num_rows(mysqli_query($koneksi,"SHOW COLUMNS FROM tamu LIKE 'photo'"))==0){mysqli_query($koneksi,"ALTER TABLE tamu ADD COLUMN photo VARCHAR(255) NULL");}
+
+// Buat folder selfie jika belum ada
+if(!is_dir('assets/selfie')) {
+    mkdir('assets/selfie', 0777, true);
+}
 
 // 3. Cek Login
 if (!isset($_SESSION['status']) || $_SESSION['status'] != "login") {
@@ -157,21 +163,87 @@ if (isset($_POST['ajax_process_qr'])) {
         if(empty($dt['checkin_at'])){
             mysqli_query($koneksi, "UPDATE tamu SET checkin_at='$waktu_checkin' WHERE id='$id_tamu'");
             $display_name = htmlspecialchars_decode($dt['nama_tamu'], ENT_QUOTES);
-            echo json_encode(['status' => 'success', 'message' => 'Selamat Datang, ' . $display_name, 'is_new' => false]);
+            echo json_encode([
+                'status' => 'success', 
+                'message' => 'Selamat Datang, ' . $display_name, 
+                'is_new' => false,
+                'id_tamu' => $id_tamu,
+                'pax' => $dt['jumlah_orang'],
+                'name' => $display_name
+            ]);
         } else {
             $display_name = htmlspecialchars_decode($dt['nama_tamu'], ENT_QUOTES);
-            echo json_encode(['status' => 'info', 'message' => $display_name . ' sudah hadir sebelumnya.']);
+            echo json_encode([
+                'status' => 'info', 
+                'message' => $display_name . ' sudah hadir sebelumnya.',
+                'id_tamu' => $id_tamu,
+                'pax' => $dt['jumlah_orang'],
+                'name' => $display_name
+            ]);
         }
     } else {
         // Jika tidak ditemukan, otomatis tambah sebagai tamu manual
         $waktu_now = date('Y-m-d H:i:s');
         $q_ins = mysqli_query($koneksi, "INSERT INTO tamu (event_id, nama_tamu, checkin_at, is_manual, jumlah_orang, kategori) VALUES ('$scan_event', '$nama_esc', '$waktu_now', 1, 1, 'UMUM')");
         if($q_ins) {
+            $new_id = mysqli_insert_id($koneksi);
             $display_name = htmlspecialchars_decode($nama_tamu, ENT_QUOTES);
-            echo json_encode(['status' => 'success', 'message' => 'Tamu baru ditambahkan & Check-in!', 'is_new' => true, 'name' => $display_name]);
+            echo json_encode([
+                'status' => 'success', 
+                'message' => 'Tamu baru ditambahkan & Check-in!', 
+                'is_new' => true, 
+                'name' => $display_name,
+                'id_tamu' => $new_id,
+                'pax' => 1
+            ]);
         } else {
             echo json_encode(['status' => 'error', 'message' => 'Gagal memproses data.']);
         }
+    }
+    exit;
+}
+
+if (isset($_POST['ajax_save_after_scan'])) {
+    header('Content-Type: application/json');
+    $id_tamu = (int)$_POST['id_tamu'];
+    $jml_pax = (int)$_POST['jml_pax'];
+    if($jml_pax < 1) $jml_pax = 1;
+
+    $photo_path = null;
+    if(!empty($_POST['selfie_image'])) {
+        $img = $_POST['selfie_image'];
+        if(strpos($img, 'data:image/webp;base64,') === 0) {
+            $img = str_replace('data:image/webp;base64,', '', $img);
+            $ext = '.webp';
+        } elseif(strpos($img, 'data:image/jpeg;base64,') === 0) {
+            $img = str_replace('data:image/jpeg;base64,', '', $img);
+            $ext = '.jpg';
+        } elseif(strpos($img, 'data:image/png;base64,') === 0) {
+            $img = str_replace('data:image/png;base64,', '', $img);
+            $ext = '.png';
+        }
+        
+        if(isset($ext)) {
+            $img = str_replace(' ', '+', $img);
+            $data = base64_decode($img);
+            $filename = 'selfie_' . $id_tamu . '_' . time() . $ext;
+            $filepath = 'assets/selfie/' . $filename;
+            if(file_put_contents($filepath, $data)) {
+                $photo_path = $filepath;
+            }
+        }
+    }
+
+    if($photo_path) {
+        $q = mysqli_query($koneksi, "UPDATE tamu SET jumlah_orang='$jml_pax', photo='$photo_path' WHERE id=$id_tamu");
+    } else {
+        $q = mysqli_query($koneksi, "UPDATE tamu SET jumlah_orang='$jml_pax' WHERE id=$id_tamu");
+    }
+
+    if($q){
+        echo json_encode(['status'=>'success', 'message'=>'Data berhasil disimpan.']);
+    } else {
+        echo json_encode(['status'=>'error', 'message'=>'Gagal menyimpan data.']);
     }
     exit;
 }
@@ -486,15 +558,24 @@ $stat_hadir = mysqli_fetch_assoc(mysqli_query($koneksi, $sql_hadir))['total'] ??
                             <td class="py-3 text-center text-gray-400"><?= $no++ ?></td>
                             
                             <td class="py-3 px-4">
-                                <div class="font-bold text-[#1a0f0d] flex items-center gap-2">
-                                    <?= $row['nama_tamu'] ?>
-                                    <?php if($row['is_manual']): ?>
-                                        <span class="inline-flex items-center gap-1 text-[8px] font-black bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded border border-amber-100 uppercase tracking-tighter">
-                                            Manual
-                                        </span>
+                                <div class="flex items-center gap-3">
+                                    <?php if(!empty($row['photo']) && file_exists($row['photo'])): ?>
+                                        <img src="<?= $row['photo'] ?>" onclick="Swal.fire({imageUrl: '<?= $row['photo'] ?>', imageAlt: 'Foto <?= htmlspecialchars($row['nama_tamu'], ENT_QUOTES) ?>', showConfirmButton: false, customClass: { image: 'rounded-2xl max-h-[70vh] object-contain' }})" class="w-10 h-10 min-w-10 rounded-full object-cover border border-[#e8e1d5] shadow-sm cursor-pointer hover:scale-110 transition-transform">
+                                    <?php else: ?>
+                                        <div class="w-10 h-10 min-w-10 rounded-full bg-[#f3e9d8] flex items-center justify-center text-[#87714c] border border-[#e8e1d5] shadow-sm"><i class="fas fa-user text-xs"></i></div>
                                     <?php endif; ?>
+                                    <div>
+                                        <div class="font-bold text-[#1a0f0d] flex items-center gap-2">
+                                            <?= $row['nama_tamu'] ?>
+                                            <?php if($row['is_manual']): ?>
+                                                <span class="inline-flex items-center gap-1 text-[8px] font-black bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded border border-amber-100 uppercase tracking-tighter">
+                                                    Manual
+                                                </span>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="text-[10px] text-[#87714c]"><?= $row['alamat'] ?? '-' ?></div>
+                                    </div>
                                 </div>
-                                <div class="text-[10px] text-[#87714c]"><?= $row['alamat'] ?? '-' ?></div>
                             </td>
 
                             <td class="py-3 px-4 text-gray-500 text-xs"><?= date('d/m/y H:i', strtotime($row['created_at'])) ?></td>
@@ -587,6 +668,46 @@ $stat_hadir = mysqli_fetch_assoc(mysqli_query($koneksi, $sql_hadir))['total'] ??
                 <div id="formScanResult" class="hidden"></div>
                 <p class="text-center text-[9px] text-[#87714c] font-black uppercase tracking-widest opacity-80">Arahkan QR ke dalam kotak scanner.</p>
             </div> 
+        </div> 
+    </div>
+
+    <!-- Modal After Scan: Edit Pax & Selfie -->
+    <div id="modalAfterScan" class="fixed inset-0 z-[70] hidden flex items-center justify-center p-4"> 
+        <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm"></div> 
+        <div class="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-gray-100"> 
+            <div class="px-5 py-4 border-b border-gray-50 flex justify-between items-center bg-white">
+                <h3 class="text-base font-black tracking-tight text-[#1a0f0d] font-serif uppercase">Lengkapi Data</h3>
+                <button onclick="closeAfterScanModal()" class="w-8 h-8 flex items-center justify-center bg-gray-50 hover:bg-red-50 hover:text-red-500 text-gray-400 rounded-lg transition-all">
+                    <iconify-icon icon="solar:close-circle-bold" class="text-xl"></iconify-icon>
+                </button>
+            </div> 
+            <div class="p-5 flex flex-col items-center gap-4">
+                <h2 id="modalAfterScan_Name" class="text-2xl font-serif font-bold text-[#1a0f0d] text-center w-full truncate">Nama Tamu</h2>
+                
+                <div class="w-full">
+                    <label class="block text-[10px] font-black text-[#87714c] uppercase tracking-widest mb-1.5 ml-1">Jumlah Pax (Orang)</label>
+                    <input type="number" id="modalAfterScan_Pax" min="1" class="w-full px-4 py-3 bg-[#faf7f0] border border-[#e8e1d5] focus:border-[#87714c] focus:ring-0 rounded-xl text-center text-lg font-bold outline-none transition-all" value="1">
+                </div>
+
+                <div class="w-full flex flex-col items-center gap-2">
+                    <label class="block text-[10px] w-full font-black text-[#87714c] uppercase tracking-widest ml-1">Selfie Tamu</label>
+                    <div class="relative w-48 h-48 bg-[#f3e9d8] rounded-full overflow-hidden border-4 border-[#e8e1d5] flex items-center justify-center shadow-inner">
+                        <video id="selfieVideo" class="w-full h-full object-cover" autoplay playsinline></video>
+                        <img id="selfiePreview" class="w-full h-full object-cover hidden">
+                        <canvas id="selfieCanvas" class="hidden"></canvas>
+                    </div>
+                    <button id="btnCaptureSelfie" type="button" onclick="captureSelfie()" class="mt-2 bg-[#87714c] hover:bg-[#6e5a3a] text-white px-5 py-2 rounded-full text-[10px] font-black tracking-widest uppercase transition-all flex items-center gap-2 shadow-md">
+                        <i class="fas fa-camera"></i> Ambil Foto
+                    </button>
+                    <button id="btnRetakeSelfie" type="button" onclick="retakeSelfie()" class="mt-2 bg-gray-200 hover:bg-gray-300 text-gray-700 px-5 py-2 rounded-full text-[10px] font-black tracking-widest uppercase transition-all hidden flex items-center gap-2">
+                        <i class="fas fa-undo"></i> Ulangi Foto
+                    </button>
+                </div>
+
+                <button id="btnSimpanAfterScan" type="button" onclick="saveAfterScan()" class="w-full mt-2 bg-[#1a0f0d] hover:bg-black text-white px-6 py-4 rounded-xl text-xs font-black tracking-widest uppercase transition-all flex justify-center items-center gap-2 shadow-lg active:scale-95">
+                    <iconify-icon icon="solar:diskette-bold-duotone" class="text-lg"></iconify-icon> SIMPAN & CHECK-IN
+                </button>
+            </div>
         </div> 
     </div>
 
@@ -684,18 +805,9 @@ $stat_hadir = mysqli_fetch_assoc(mysqli_query($koneksi, $sql_hadir))['total'] ??
                         },
                         success: function(res) {
                             if(typeof res === 'string') res = JSON.parse(res);
-                            if(res.status === 'success') {
-                                Swal.fire({
-                                    title: 'Berhasil!',
-                                    text: res.message,
-                                    icon: 'success',
-                                    timer: 1500,
-                                    showConfirmButton: false
-                                });
-                                // Refresh stats & table
-                                let targetUrl = window.location.pathname + '?event_id=<?= $selected_event_id ?>';
-                                $('#stat-grid').load(targetUrl + ' #stat-grid > *');
-                                $('#mainTable').load(targetUrl + ' #mainTable > *');
+                            if(res.status === 'success' || res.status === 'info') {
+                                stopCamera();
+                                openAfterScanModal(res.id_tamu, res.name, res.pax);
                             } else {
                                 Swal.fire({
                                     title: res.status === 'info' ? 'Info' : 'Gagal',
@@ -704,10 +816,8 @@ $stat_hadir = mysqli_fetch_assoc(mysqli_query($koneksi, $sql_hadir))['total'] ??
                                     timer: 2000,
                                     showConfirmButton: false
                                 });
+                                setTimeout(() => { isScanning = false; }, 2500);
                             }
-                            
-                            // Re-enable scanning after a delay to prevent double scan
-                            setTimeout(() => { isScanning = false; }, 2500);
                         },
                         error: function(xhr, status, error) {
                             Swal.fire('Error', 'Gagal menghubungi server. Silakan coba lagi.', 'error');
@@ -807,19 +917,9 @@ $stat_hadir = mysqli_fetch_assoc(mysqli_query($koneksi, $sql_hadir))['total'] ??
                 },
                 success: function(res) {
                     if(typeof res === 'string') res = JSON.parse(res);
-                    if(res.status === 'success') {
-                        Swal.fire({
-                            title: 'Berhasil!',
-                            text: res.message,
-                            icon: 'success',
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
+                    if(res.status === 'success' || res.status === 'info') {
                         document.getElementById('manualInputName').value = '';
-                        // Refresh stats & table
-                        let targetUrl = window.location.pathname + '?event_id=<?= $selected_event_id ?>';
-                        $('#stat-grid').load(targetUrl + ' #stat-grid > *');
-                        $('#mainTable').load(targetUrl + ' #mainTable > *');
+                        openAfterScanModal(res.id_tamu, res.name, res.pax);
                     } else {
                         Swal.fire({
                             title: res.status === 'info' ? 'Info' : 'Gagal',
@@ -847,6 +947,151 @@ $stat_hadir = mysqli_fetch_assoc(mysqli_query($koneksi, $sql_hadir))['total'] ??
                 document.getElementById('modalScanQR').classList.add('hidden');
                 document.getElementById('modalScanQR').classList.remove('flex');
             }
+        }
+
+        // --- AFTER SCAN LOGIC (PAX & SELFIE) ---
+        let currentSelfieStream = null;
+        let currentTamuId = null;
+
+        function openAfterScanModal(id_tamu, name, pax) {
+            currentTamuId = id_tamu;
+            document.getElementById('modalAfterScan_Name').innerText = name;
+            document.getElementById('modalAfterScan_Pax').value = pax || 1;
+            
+            document.getElementById('selfiePreview').classList.add('hidden');
+            document.getElementById('selfieVideo').classList.remove('hidden');
+            
+            const canvas = document.getElementById('selfieCanvas');
+            canvas.getContext('2d').clearRect(0,0, canvas.width, canvas.height);
+            
+            document.getElementById('btnCaptureSelfie').classList.remove('hidden');
+            document.getElementById('btnRetakeSelfie').classList.add('hidden');
+            
+            document.getElementById('modalAfterScan').classList.remove('hidden');
+            document.getElementById('modalAfterScan').classList.add('flex');
+            
+            startSelfieCamera();
+        }
+
+        function startSelfieCamera() {
+            const video = document.getElementById('selfieVideo');
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+                .then(function(stream) {
+                    currentSelfieStream = stream;
+                    video.srcObject = stream;
+                    video.play();
+                })
+                .catch(function(err) {
+                    console.log("Error access camera: ", err);
+                });
+            } else {
+                console.log("Camera API not supported.");
+            }
+        }
+
+        function stopSelfieCamera() {
+            if (currentSelfieStream) {
+                currentSelfieStream.getTracks().forEach(track => track.stop());
+                currentSelfieStream = null;
+            }
+        }
+
+        function captureSelfie() {
+            const video = document.getElementById('selfieVideo');
+            const canvas = document.getElementById('selfieCanvas');
+            const preview = document.getElementById('selfiePreview');
+            
+            // Kompresi Gambar Maksimal Resolusi 800px
+            const MAX_SIZE = 800;
+            let width = video.videoWidth || 400;
+            let height = video.videoHeight || 400;
+            
+            if (width > height) {
+                if (width > MAX_SIZE) {
+                    height *= MAX_SIZE / width;
+                    width = MAX_SIZE;
+                }
+            } else {
+                if (height > MAX_SIZE) {
+                    width *= MAX_SIZE / height;
+                    height = MAX_SIZE;
+                }
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Draw image
+            canvas.getContext('2d').drawImage(video, 0, 0, width, height);
+            
+            // Kompres menggunakan WebP dengan kualitas 0.7 (70%)
+            // WebP jauh lebih kecil sizenya dibanding JPEG dan kualitasnya tetap bagus
+            preview.src = canvas.toDataURL('image/webp', 0.7);
+            video.classList.add('hidden');
+            preview.classList.remove('hidden');
+            
+            document.getElementById('btnCaptureSelfie').classList.add('hidden');
+            document.getElementById('btnRetakeSelfie').classList.remove('hidden');
+        }
+
+        function retakeSelfie() {
+            document.getElementById('selfiePreview').classList.add('hidden');
+            document.getElementById('selfieVideo').classList.remove('hidden');
+            document.getElementById('btnCaptureSelfie').classList.remove('hidden');
+            document.getElementById('btnRetakeSelfie').classList.add('hidden');
+        }
+
+        function closeAfterScanModal() {
+            stopSelfieCamera();
+            document.getElementById('modalAfterScan').classList.add('hidden');
+            document.getElementById('modalAfterScan').classList.remove('flex');
+        }
+
+        function saveAfterScan() {
+            const pax = document.getElementById('modalAfterScan_Pax').value;
+            let imgData = '';
+            
+            if(!document.getElementById('selfiePreview').classList.contains('hidden')) {
+                imgData = document.getElementById('selfiePreview').src;
+            }
+            
+            const btnSimpan = document.getElementById('btnSimpanAfterScan');
+            const originalHtml = btnSimpan.innerHTML;
+            btnSimpan.innerHTML = '<i class="fas fa-spinner fa-spin"></i> MENYIMPAN...';
+            btnSimpan.disabled = true;
+
+            $.ajax({
+                url: window.location.href,
+                method: 'POST',
+                dataType: 'json',
+                data: {
+                    ajax_save_after_scan: 1,
+                    id_tamu: currentTamuId,
+                    jml_pax: pax,
+                    selfie_image: imgData
+                },
+                success: function(res) {
+                    btnSimpan.innerHTML = originalHtml;
+                    btnSimpan.disabled = false;
+                    
+                    if(res.status === 'success') {
+                        Swal.fire({ title: 'Berhasil!', text: res.message, icon: 'success', timer: 1500, showConfirmButton: false });
+                        closeAfterScanModal();
+                        
+                        let targetUrl = window.location.pathname + '?event_id=<?= $selected_event_id ?>';
+                        $('#stat-grid').load(targetUrl + ' #stat-grid > *');
+                        $('#mainTable').load(targetUrl + ' #mainTable > *');
+                    } else {
+                        Swal.fire({ title: 'Gagal', text: res.message, icon: 'error', timer: 1500, showConfirmButton: false });
+                    }
+                },
+                error: function() {
+                    btnSimpan.innerHTML = originalHtml;
+                    btnSimpan.disabled = false;
+                    Swal.fire({ title: 'Error', text: 'Terjadi kesalahan jaringan', icon: 'error' });
+                }
+            });
         }
     </script>
 </body>
