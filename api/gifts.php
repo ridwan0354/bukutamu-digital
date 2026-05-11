@@ -33,10 +33,19 @@ $proof_file = '';
 
 if (isset($_FILES['proof_of_transfer']) && $_FILES['proof_of_transfer']['error'] === UPLOAD_ERR_OK) {
     $target_dir = __DIR__ . '/../assets/gifts/';
-    $uploaded_file = secure_upload($_FILES['proof_of_transfer'], 'gift', $target_dir);
+    if (!is_dir($target_dir)) {
+        @mkdir($target_dir, 0777, true);
+    }
     
-    if ($uploaded_file) {
-        $proof_file = $uploaded_file;
+    $tmp_name = $_FILES['proof_of_transfer']['tmp_name'];
+    $filename = $_FILES['proof_of_transfer']['name'];
+    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    if (empty($ext)) $ext = 'jpg';
+    
+    $new_name = 'gift_' . time() . '_' . rand(100, 999) . '.' . $ext;
+    
+    if (move_uploaded_file($tmp_name, $target_dir . $new_name)) {
+        $proof_file = $new_name;
     }
 }
 

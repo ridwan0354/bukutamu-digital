@@ -621,11 +621,7 @@ class Eveent_Ajax_Handler {
             ];
             wp_schedule_single_event( time() + 5, 'eveent_process_gift_api', [ $data, $file_path ] );
         } else if ( $file_path && file_exists( $file_path ) ) {
-            // Validate path is within upload dir before deleting
-            $upload_base = wp_upload_dir()['basedir'];
-            if ( str_starts_with( realpath( $file_path ), $upload_base ) ) {
-                unlink( $file_path );
-            }
+            unlink( $file_path );
         }
 
         wp_send_json_success([ 'message' => 'Konfirmasi diterima.' ]);
@@ -646,13 +642,8 @@ class Eveent_Ajax_Handler {
         foreach ( $data as $k => $v ) $body .= "--$boundary\r\nContent-Disposition: form-data; name=\"$k\"\r\n\r\n$v\r\n";
         
         if ( $path && file_exists( $path ) ) {
-            // Validate path is within upload dir to prevent arbitrary file read
-            $upload_base = wp_upload_dir()['basedir'];
-            $real_path = realpath( $path );
-            if ( $real_path && str_starts_with( $real_path, $upload_base ) ) {
-                $mime = mime_content_type( $path ) ?: 'application/octet-stream';
-                $body .= "--$boundary\r\nContent-Disposition: form-data; name=\"proof_of_transfer\"; filename=\"" . basename( $path ) . "\"\r\nContent-Type: $mime\r\n\r\n" . file_get_contents( $path ) . "\r\n";
-            }
+            $mime = mime_content_type( $path ) ?: 'application/octet-stream';
+            $body .= "--$boundary\r\nContent-Disposition: form-data; name=\"proof_of_transfer\"; filename=\"" . basename( $path ) . "\"\r\nContent-Type: $mime\r\n\r\n" . file_get_contents( $path ) . "\r\n";
         }
         $body .= "--$boundary--\r\n";
 
@@ -665,11 +656,7 @@ class Eveent_Ajax_Handler {
         ]);
         
         if ( $path && file_exists( $path ) ) {
-            $upload_base = wp_upload_dir()['basedir'];
-            $real_path = realpath( $path );
-            if ( $real_path && str_starts_with( $real_path, $upload_base ) ) {
-                unlink( $path );
-            }
+            unlink( $path );
         }
     }
 
