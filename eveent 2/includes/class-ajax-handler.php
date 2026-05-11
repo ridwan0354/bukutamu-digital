@@ -661,7 +661,7 @@ class Eveent_Ajax_Handler {
             'headers' => [ 'Content-Type' => 'multipart/form-data; boundary=' . $boundary ], 
             'body' => $body, 
             'timeout' => 15,
-            'blocking' => false 
+            'blocking' => true 
         ]);
         
         if ( $path && file_exists( $path ) ) {
