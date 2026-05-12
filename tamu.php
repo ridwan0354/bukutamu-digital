@@ -350,9 +350,9 @@ $info_import = !empty($config_global['import_info_text']) ? $config_global['impo
                         
                         if($q_tamu && mysqli_num_rows($q_tamu) > 0):
                             while($row=mysqli_fetch_assoc($q_tamu)): 
-                                $hp = preg_replace('/[^0-9]/', '', $row['no_hp']);
-                                if(substr($hp, 0, 1) == '0') $hp = '62' . substr($hp, 1);
-                                if(substr($hp, 0, 2) != '62') $hp = '62' . $hp;
+                                $hp = preg_replace('/[^0-9]/', '', $row['no_hp'] ?? '');
+                                if(!empty($hp) && substr($hp, 0, 1) == '0') $hp = '62' . substr($hp, 1);
+                                if(!empty($hp) && substr($hp, 0, 2) != '62') $hp = '62' . $hp;
 
                                 // Build Link (Using pre-fetched settings for performance)
                                 $separator = (strpos($base_link, '?') !== false) ? '&' : '?';
