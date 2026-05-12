@@ -14,10 +14,13 @@ if(!isset($config)){
 // Cek fitur add-on Konfirmasi Hadiah
 $show_hadiah = 1; // default tampil
 if($role != 'admin') {
-    $q_uh = mysqli_query($koneksi, "SELECT show_hadiah FROM users WHERE id='$uid_sidebar' LIMIT 1");
+    $q_uh = mysqli_query($koneksi, "SELECT show_hadiah, show_ucapan FROM users WHERE id='$uid_sidebar' LIMIT 1");
     if($q_uh && $row_uh = mysqli_fetch_assoc($q_uh)) {
         $show_hadiah = (int)($row_uh['show_hadiah'] ?? 1);
+        $show_ucapan = (int)($row_uh['show_ucapan'] ?? 1);
     }
+} else {
+    $show_ucapan = 1;
 }
 
 // LOGIKA LINK HOME
@@ -132,9 +135,11 @@ $has_logo  = !empty($config['logo_dashboard']) && file_exists($logo_path);
                 <iconify-icon icon="solar:qr-code-bold-duotone" class="text-xl"></iconify-icon> <span class="text-sm">QR Generator</span>
             </a>
 
+            <?php if($show_ucapan || $role == 'admin'): ?>
             <a href="ucapan.php" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition-all <?= ($page == 'ucapan.php') ? 'bg-gold text-white shadow-gold' : 'text-brown hover-cream hover:text-gold' ?>">
                 <iconify-icon icon="solar:chat-round-dots-bold-duotone" class="text-xl"></iconify-icon> <span class="text-sm">Ucapan & Doa</span>
             </a>
+            <?php endif; ?>
             
             <a href="report.php" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition-all <?= ($page == 'report.php') ? 'bg-gold text-white shadow-gold' : 'text-brown hover-cream hover:text-gold' ?>">
                 <iconify-icon icon="solar:chart-bold-duotone" class="text-xl"></iconify-icon> <span class="text-sm">Laporan</span>
@@ -246,12 +251,14 @@ $has_logo  = !empty($config['logo_dashboard']) && file_exists($logo_path);
                 <span class="text-[9px] font-bold text-brown truncate w-full text-center">QR Gen</span>
             </a>
 
+            <?php if($show_ucapan || $role == 'admin'): ?>
             <a href="ucapan.php" class="flex flex-col items-center gap-2">
                 <div class="w-12 h-12 bg-[#faf7f0] text-gold rounded-xl flex items-center justify-center text-xl shadow-sm border border-[#e8e1d5] transition active:scale-95">
                     <iconify-icon icon="solar:chat-round-dots-bold-duotone"></iconify-icon>
                 </div>
                 <span class="text-[9px] font-bold text-brown truncate w-full text-center">Ucapan</span>
             </a>
+            <?php endif; ?>
 
             <a href="report.php" class="flex flex-col items-center gap-2">
                 <div class="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center text-xl shadow-sm border border-green-100 transition active:scale-95">

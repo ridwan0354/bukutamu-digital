@@ -13,6 +13,11 @@ $check_hadiah = mysqli_query($koneksi, "SHOW COLUMNS FROM users LIKE 'show_hadia
 if (mysqli_num_rows($check_hadiah) == 0) {
     mysqli_query($koneksi, "ALTER TABLE users ADD COLUMN show_hadiah TINYINT(1) NOT NULL DEFAULT 1 AFTER post_id");
 }
+// AUTO-FIX: Cek kolom show_ucapan (fitur add-on Ucapan & Doa)
+$check_ucapan = mysqli_query($koneksi, "SHOW COLUMNS FROM users LIKE 'show_ucapan'");
+if (mysqli_num_rows($check_ucapan) == 0) {
+    mysqli_query($koneksi, "ALTER TABLE users ADD COLUMN show_ucapan TINYINT(1) NOT NULL DEFAULT 1 AFTER show_hadiah");
+}
 $swal_script="";
 function redirectWithMsg($url,$msg_key){echo "<script>window.location.href='$url".(strpos($url,'?')?'&':'?')."msg=$msg_key';</script>";exit;}
 
@@ -24,6 +29,7 @@ if(isset($_POST['add_mempelai'])){
     $limit = isset($_POST['event_limit']) ? (int)$_POST['event_limit'] : 1;
     $post_id = isset($_POST['post_id']) ? (int)$_POST['post_id'] : 0;
     $show_hadiah = isset($_POST['show_hadiah']) ? 1 : 0;
+    $show_ucapan = isset($_POST['show_ucapan']) ? 1 : 0;
     
     $cek_stmt = mysqli_prepare($koneksi, "SELECT id FROM users WHERE username = ?");
     mysqli_stmt_bind_param($cek_stmt, "s", $user);
@@ -33,9 +39,9 @@ if(isset($_POST['add_mempelai'])){
     if(mysqli_num_rows($cek_res) > 0){
         $swal_script = "ModalAlert.fire('Gagal', 'Username sudah digunakan, pilih yang lain.', 'error');";
     } else {
-        $query = "INSERT INTO users (username, password, nama_lengkap, role, event_limit, post_id, show_hadiah) VALUES (?, ?, ?, 'mempelai', ?, ?, ?)";
+        $query = "INSERT INTO users (username, password, nama_lengkap, role, event_limit, post_id, show_hadiah, show_ucapan) VALUES (?, ?, ?, 'mempelai', ?, ?, ?, ?)";
         $stmt = mysqli_prepare($koneksi, $query);
-        mysqli_stmt_bind_param($stmt, "sssiii", $user, $pass, $nama, $limit, $post_id, $show_hadiah);
+        mysqli_stmt_bind_param($stmt, "sssiiii", $user, $pass, $nama, $limit, $post_id, $show_hadiah, $show_ucapan);
         if(mysqli_stmt_execute($stmt)){
             redirectWithMsg("kelola_mempelai.php","added");
         } else {
@@ -53,6 +59,7 @@ if(isset($_POST['edit_mempelai'])){
     $limit = (int)$_POST['event_limit'];
     $post_id = (int)$_POST['post_id'];
     $show_hadiah = isset($_POST['show_hadiah']) ? 1 : 0;
+    $show_ucapan = isset($_POST['show_ucapan']) ? 1 : 0;
     
     // 1. Cek duplikat username (kecuali milik sendiri)
     $stmt_cek = mysqli_prepare($koneksi, "SELECT id FROM users WHERE username = ? AND id != ?");
@@ -68,13 +75,13 @@ if(isset($_POST['edit_mempelai'])){
         // 2. Proses Update
         if(!empty($_POST['password'])){
             $pass = password_hash($_POST['password'], PASSWORD_DEFAULT);
-            $sql = "UPDATE users SET username=?, nama_lengkap=?, password=?, event_limit=?, post_id=?, show_hadiah=? WHERE id=? AND role='mempelai'";
+            $sql = "UPDATE users SET username=?, nama_lengkap=?, password=?, event_limit=?, post_id=?, show_hadiah=?, show_ucapan=? WHERE id=? AND role='mempelai'";
             $stmt = mysqli_prepare($koneksi, $sql);
-            mysqli_stmt_bind_param($stmt, "sssiiii", $user, $nama, $pass, $limit, $post_id, $show_hadiah, $id);
+            mysqli_stmt_bind_param($stmt, "sssiiiii", $user, $nama, $pass, $limit, $post_id, $show_hadiah, $show_ucapan, $id);
         } else {
-            $sql = "UPDATE users SET username=?, nama_lengkap=?, event_limit=?, post_id=?, show_hadiah=? WHERE id=? AND role='mempelai'";
+            $sql = "UPDATE users SET username=?, nama_lengkap=?, event_limit=?, post_id=?, show_hadiah=?, show_ucapan=? WHERE id=? AND role='mempelai'";
             $stmt = mysqli_prepare($koneksi, $sql);
-            mysqli_stmt_bind_param($stmt, "ssiiii", $user, $nama, $limit, $post_id, $show_hadiah, $id);
+            mysqli_stmt_bind_param($stmt, "ssiiiii", $user, $nama, $limit, $post_id, $show_hadiah, $show_ucapan, $id);
         }
         
         if(mysqli_stmt_execute($stmt)){
@@ -210,6 +217,14 @@ $total_mempelai=mysqli_num_rows($users);
                         </label>
                     </div>
                     <div class="col-span-2 lg:col-span-2">
+                        <label class="block text-[10px] font-bold text-[#C5A880] uppercase mb-1 ml-2">Ucapan &amp; Doa</label>
+                        <label class="relative inline-flex items-center cursor-pointer w-full justify-center gap-3 bg-[#ffffff] border border-[#e8e1d5] rounded-xl px-3 py-2.5">
+                            <input type="checkbox" name="show_ucapan" id="add_show_ucapan" value="1" checked class="sr-only peer">
+                            <div class="w-10 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:bg-[#C5A880] transition-all after:content-[''] after:absolute after:top-[12px] after:left-[13px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5 relative"></div>
+                            <span id="add_ucapan_label" class="text-xs font-bold text-[#C5A880]">Aktif</span>
+                        </label>
+                    </div>
+                    <div class="col-span-2 lg:col-span-2">
                         <button type="submit" name="add_mempelai" class="w-full bg-gradient-to-br from-[#C5A880] to-[#000000] text-white font-bold py-2.5 px-4 rounded-xl shadow-lg transition transform active:scale-95 text-sm flex items-center justify-center gap-2">
                             <iconify-icon icon="solar:diskette-bold-duotone" class="text-lg"></iconify-icon> SIMPAN
                         </button>
@@ -279,7 +294,8 @@ $total_mempelai=mysqli_num_rows($users);
                                             $u['username'], 
                                             (int)$u['event_limit'], 
                                             $u['post_id'],
-                                            (int)($u['show_hadiah'] ?? 1)
+                                            (int)($u['show_hadiah'] ?? 1),
+                                            (int)($u['show_ucapan'] ?? 1)
                                         ], JSON_HEX_APOS | JSON_HEX_QUOT);
                                         ?>
                                         <button onclick='openEditModal(<?= htmlspecialchars($js_edit, ENT_QUOTES) ?>)' class="text-[#C5A880] hover:text-[#000000] bg-[#faf7f0] w-9 h-9 flex items-center justify-center rounded-xl border border-[#e8e1d5] transition shadow-sm">
@@ -340,16 +356,27 @@ $total_mempelai=mysqli_num_rows($users);
                         <input type="password" name="password" placeholder="••••" class="w-full bg-[#ffffff] border border-[#e8e1d5] p-3 rounded-xl text-sm focus:ring-2 focus:ring-[#C5A880] outline-none">
                     </div>
                 </div>
-                <div class="bg-[#faf7f0] border border-[#e8e1d5] rounded-xl p-4">
+                <div class="bg-[#faf7f0] border border-[#e8e1d5] rounded-xl p-4 space-y-3">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-[10px] font-bold text-[#C5A880] uppercase tracking-widest">Fitur Konfirmasi Hadiah</p>
-                            <p class="text-[11px] text-gray-400 mt-0.5">Add-on — aktifkan jika user berlangganan fitur ini</p>
+                            <p class="text-[11px] text-gray-400 mt-0.5">Add-on — aktifkan jika user berlangganan</p>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer gap-2">
                             <input type="checkbox" name="show_hadiah" id="edit_show_hadiah" value="1" class="sr-only peer">
                             <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-[#C5A880] transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5 relative"></div>
                             <span id="edit_hadiah_label" class="text-xs font-bold text-gray-500 min-w-[32px]">Mati</span>
+                        </label>
+                    </div>
+                    <div class="border-t border-[#e8e1d5] pt-3 flex items-center justify-between">
+                        <div>
+                            <p class="text-[10px] font-bold text-[#C5A880] uppercase tracking-widest">Fitur Ucapan &amp; Doa</p>
+                            <p class="text-[11px] text-gray-400 mt-0.5">Add-on — aktifkan jika user berlangganan</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer gap-2">
+                            <input type="checkbox" name="show_ucapan" id="edit_show_ucapan" value="1" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-[#C5A880] transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5 relative"></div>
+                            <span id="edit_ucapan_label" class="text-xs font-bold text-gray-500 min-w-[32px]">Mati</span>
                         </label>
                     </div>
                 </div>
@@ -394,16 +421,20 @@ $total_mempelai=mysqli_num_rows($users);
     }
 
     function openEditModal(data) {
-        let [id, nama, user, limit, postId, showHadiah] = data;
+        let [id, nama, user, limit, postId, showHadiah, showUcapan] = data;
         document.getElementById('edit_id').value = id;
         document.getElementById('edit_nama').value = nama;
         document.getElementById('edit_user').value = user;
         document.getElementById('edit_limit').value = limit;
         document.getElementById('edit_post_id').value = postId;
-        const cb = document.getElementById('edit_show_hadiah');
-        cb.checked = (showHadiah == 1);
-        document.getElementById('edit_hadiah_label').textContent = cb.checked ? 'Aktif' : 'Mati';
-        document.getElementById('edit_hadiah_label').className = 'text-xs font-bold min-w-[32px] ' + (cb.checked ? 'text-[#C5A880]' : 'text-gray-400');
+        const cbH = document.getElementById('edit_show_hadiah');
+        cbH.checked = (showHadiah == 1);
+        document.getElementById('edit_hadiah_label').textContent = cbH.checked ? 'Aktif' : 'Mati';
+        document.getElementById('edit_hadiah_label').className = 'text-xs font-bold min-w-[32px] ' + (cbH.checked ? 'text-[#C5A880]' : 'text-gray-400');
+        const cbU = document.getElementById('edit_show_ucapan');
+        cbU.checked = (showUcapan == 1);
+        document.getElementById('edit_ucapan_label').textContent = cbU.checked ? 'Aktif' : 'Mati';
+        document.getElementById('edit_ucapan_label').className = 'text-xs font-bold min-w-[32px] ' + (cbU.checked ? 'text-[#C5A880]' : 'text-gray-400');
         document.getElementById('editModal').classList.remove('hidden');
         document.body.classList.add('modal-active');
     }
@@ -413,16 +444,26 @@ $total_mempelai=mysqli_num_rows($users);
         document.body.classList.remove('modal-active');
     }
 
-    // Real-time label update untuk toggle di modal Edit
+    // Real-time label update — modal Edit
     document.getElementById('edit_show_hadiah').addEventListener('change', function() {
         const lbl = document.getElementById('edit_hadiah_label');
         lbl.textContent = this.checked ? 'Aktif' : 'Mati';
         lbl.className = 'text-xs font-bold min-w-[32px] ' + (this.checked ? 'text-[#C5A880]' : 'text-gray-400');
     });
+    document.getElementById('edit_show_ucapan').addEventListener('change', function() {
+        const lbl = document.getElementById('edit_ucapan_label');
+        lbl.textContent = this.checked ? 'Aktif' : 'Mati';
+        lbl.className = 'text-xs font-bold min-w-[32px] ' + (this.checked ? 'text-[#C5A880]' : 'text-gray-400');
+    });
 
-    // Real-time label update untuk toggle di form Tambah
+    // Real-time label update — form Tambah
     document.getElementById('add_show_hadiah').addEventListener('change', function() {
         const lbl = document.getElementById('add_hadiah_label');
+        lbl.textContent = this.checked ? 'Aktif' : 'Mati';
+        lbl.className = 'text-xs font-bold ' + (this.checked ? 'text-[#C5A880]' : 'text-gray-400');
+    });
+    document.getElementById('add_show_ucapan').addEventListener('change', function() {
+        const lbl = document.getElementById('add_ucapan_label');
         lbl.textContent = this.checked ? 'Aktif' : 'Mati';
         lbl.className = 'text-xs font-bold ' + (this.checked ? 'text-[#C5A880]' : 'text-gray-400');
     });
