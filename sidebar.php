@@ -93,7 +93,7 @@ $has_logo  = !empty($config['logo_dashboard']) && file_exists($logo_path);
         <div class="flex items-center gap-3">
             <div class="text-right hidden md:block">
                 <p class="text-sm font-bold text-brown"><?= $_SESSION['nama_lengkap'] ?? 'Admin' ?></p>
-                <p class="text-[10px] text-gold uppercase tracking-widest font-bold opacity-80"><?= $role ?></p>
+                <p class="text-[10px] text-gold uppercase tracking-widest font-bold opacity-80"><?= ['admin' => 'Administrator', 'mempelai' => 'Member', 'receptionist' => 'Resepsionis'][$role] ?? 'Member' ?></p>
             </div>
             <a href="profil.php" class="w-9 h-9 bg-[#faf7f0] text-[#87714c] rounded-xl flex items-center justify-center border border-[#e8e1d5] hover:bg-[#87714c] hover:text-white transition shadow-sm" title="Profil Saya">
                 <iconify-icon icon="solar:user-bold-duotone" class="text-xl"></iconify-icon>
