@@ -464,7 +464,7 @@ $stat_hadir = mysqli_fetch_assoc(mysqli_query($koneksi, $sql_hadir))['total'] ??
                         </div>
                     </div>
                     <div class="mb-2 lg:mb-4">
-                        <span class="inline-block py-1.5 px-4 rounded-full bg-[#1a0f0d] text-white text-[10px] font-bold tracking-widest uppercase mb-2 shadow-sm border border-[#1a0f0d]">The Wedding Of</span>
+                        <span class="inline-block py-1.5 px-4 rounded-full bg-[#1a0f0d] text-white text-[10px] font-bold tracking-widest uppercase mb-2 shadow-sm border border-[#1a0f0d]"><?= htmlspecialchars($current_event['event_subtitle'] ?? 'The Wedding Of') ?></span>
                         <h1 class="text-3xl lg:text-5xl font-serif font-bold text-[#1a0f0d] drop-shadow-sm leading-tight"><?= $display_title ?></h1>
                         <p class="text-sm text-[#87714c] mt-2 flex items-center justify-center lg:justify-start gap-2 font-medium"><i class="far fa-calendar"></i> <?= $display_date ?></p>
                     </div>

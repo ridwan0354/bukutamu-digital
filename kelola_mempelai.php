@@ -8,6 +8,11 @@ $check_col = mysqli_query($koneksi, "SHOW COLUMNS FROM users LIKE 'post_id'");
 if (mysqli_num_rows($check_col) == 0) {
     mysqli_query($koneksi, "ALTER TABLE users ADD COLUMN post_id INT(11) DEFAULT 0 AFTER event_limit");
 }
+// AUTO-FIX: Cek kolom show_hadiah (fitur add-on Konfirmasi Hadiah)
+$check_hadiah = mysqli_query($koneksi, "SHOW COLUMNS FROM users LIKE 'show_hadiah'");
+if (mysqli_num_rows($check_hadiah) == 0) {
+    mysqli_query($koneksi, "ALTER TABLE users ADD COLUMN show_hadiah TINYINT(1) NOT NULL DEFAULT 1 AFTER post_id");
+}
 $swal_script="";
 function redirectWithMsg($url,$msg_key){echo "<script>window.location.href='$url".(strpos($url,'?')?'&':'?')."msg=$msg_key';</script>";exit;}
 
@@ -18,6 +23,7 @@ if(isset($_POST['add_mempelai'])){
     $nama = trim($_POST['nama_lengkap']);
     $limit = isset($_POST['event_limit']) ? (int)$_POST['event_limit'] : 1;
     $post_id = isset($_POST['post_id']) ? (int)$_POST['post_id'] : 0;
+    $show_hadiah = isset($_POST['show_hadiah']) ? 1 : 0;
     
     $cek_stmt = mysqli_prepare($koneksi, "SELECT id FROM users WHERE username = ?");
     mysqli_stmt_bind_param($cek_stmt, "s", $user);
@@ -27,9 +33,9 @@ if(isset($_POST['add_mempelai'])){
     if(mysqli_num_rows($cek_res) > 0){
         $swal_script = "ModalAlert.fire('Gagal', 'Username sudah digunakan, pilih yang lain.', 'error');";
     } else {
-        $query = "INSERT INTO users (username, password, nama_lengkap, role, event_limit, post_id) VALUES (?, ?, ?, 'mempelai', ?, ?)";
+        $query = "INSERT INTO users (username, password, nama_lengkap, role, event_limit, post_id, show_hadiah) VALUES (?, ?, ?, 'mempelai', ?, ?, ?)";
         $stmt = mysqli_prepare($koneksi, $query);
-        mysqli_stmt_bind_param($stmt, "sssii", $user, $pass, $nama, $limit, $post_id);
+        mysqli_stmt_bind_param($stmt, "sssiii", $user, $pass, $nama, $limit, $post_id, $show_hadiah);
         if(mysqli_stmt_execute($stmt)){
             redirectWithMsg("kelola_mempelai.php","added");
         } else {
@@ -46,6 +52,7 @@ if(isset($_POST['edit_mempelai'])){
     $nama = trim($_POST['nama_lengkap']);
     $limit = (int)$_POST['event_limit'];
     $post_id = (int)$_POST['post_id'];
+    $show_hadiah = isset($_POST['show_hadiah']) ? 1 : 0;
     
     // 1. Cek duplikat username (kecuali milik sendiri)
     $stmt_cek = mysqli_prepare($koneksi, "SELECT id FROM users WHERE username = ? AND id != ?");
@@ -61,13 +68,13 @@ if(isset($_POST['edit_mempelai'])){
         // 2. Proses Update
         if(!empty($_POST['password'])){
             $pass = password_hash($_POST['password'], PASSWORD_DEFAULT);
-            $sql = "UPDATE users SET username=?, nama_lengkap=?, password=?, event_limit=?, post_id=? WHERE id=? AND role='mempelai'";
+            $sql = "UPDATE users SET username=?, nama_lengkap=?, password=?, event_limit=?, post_id=?, show_hadiah=? WHERE id=? AND role='mempelai'";
             $stmt = mysqli_prepare($koneksi, $sql);
-            mysqli_stmt_bind_param($stmt, "sssiii", $user, $nama, $pass, $limit, $post_id, $id);
+            mysqli_stmt_bind_param($stmt, "sssiiii", $user, $nama, $pass, $limit, $post_id, $show_hadiah, $id);
         } else {
-            $sql = "UPDATE users SET username=?, nama_lengkap=?, event_limit=?, post_id=? WHERE id=? AND role='mempelai'";
+            $sql = "UPDATE users SET username=?, nama_lengkap=?, event_limit=?, post_id=?, show_hadiah=? WHERE id=? AND role='mempelai'";
             $stmt = mysqli_prepare($koneksi, $sql);
-            mysqli_stmt_bind_param($stmt, "ssiii", $user, $nama, $limit, $post_id, $id);
+            mysqli_stmt_bind_param($stmt, "ssiiii", $user, $nama, $limit, $post_id, $show_hadiah, $id);
         }
         
         if(mysqli_stmt_execute($stmt)){
@@ -195,6 +202,14 @@ $total_mempelai=mysqli_num_rows($users);
                         </div>
                     </div>
                     <div class="col-span-2 lg:col-span-2">
+                        <label class="block text-[10px] font-bold text-[#C5A880] uppercase mb-1 ml-2">Konfirmasi Hadiah</label>
+                        <label class="relative inline-flex items-center cursor-pointer w-full justify-center gap-3 bg-[#ffffff] border border-[#e8e1d5] rounded-xl px-3 py-2.5">
+                            <input type="checkbox" name="show_hadiah" id="add_show_hadiah" value="1" checked class="sr-only peer">
+                            <div class="w-10 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:bg-[#C5A880] transition-all after:content-[''] after:absolute after:top-[12px] after:left-[13px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5 relative"></div>
+                            <span id="add_hadiah_label" class="text-xs font-bold text-[#C5A880]">Aktif</span>
+                        </label>
+                    </div>
+                    <div class="col-span-2 lg:col-span-2">
                         <button type="submit" name="add_mempelai" class="w-full bg-gradient-to-br from-[#C5A880] to-[#000000] text-white font-bold py-2.5 px-4 rounded-xl shadow-lg transition transform active:scale-95 text-sm flex items-center justify-center gap-2">
                             <iconify-icon icon="solar:diskette-bold-duotone" class="text-lg"></iconify-icon> SIMPAN
                         </button>
@@ -263,7 +278,8 @@ $total_mempelai=mysqli_num_rows($users);
                                             $u['nama_lengkap'], 
                                             $u['username'], 
                                             (int)$u['event_limit'], 
-                                            $u['post_id']
+                                            $u['post_id'],
+                                            (int)($u['show_hadiah'] ?? 1)
                                         ], JSON_HEX_APOS | JSON_HEX_QUOT);
                                         ?>
                                         <button onclick='openEditModal(<?= htmlspecialchars($js_edit, ENT_QUOTES) ?>)' class="text-[#C5A880] hover:text-[#000000] bg-[#faf7f0] w-9 h-9 flex items-center justify-center rounded-xl border border-[#e8e1d5] transition shadow-sm">
@@ -324,6 +340,19 @@ $total_mempelai=mysqli_num_rows($users);
                         <input type="password" name="password" placeholder="••••" class="w-full bg-[#ffffff] border border-[#e8e1d5] p-3 rounded-xl text-sm focus:ring-2 focus:ring-[#C5A880] outline-none">
                     </div>
                 </div>
+                <div class="bg-[#faf7f0] border border-[#e8e1d5] rounded-xl p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-[10px] font-bold text-[#C5A880] uppercase tracking-widest">Fitur Konfirmasi Hadiah</p>
+                            <p class="text-[11px] text-gray-400 mt-0.5">Add-on — aktifkan jika user berlangganan fitur ini</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer gap-2">
+                            <input type="checkbox" name="show_hadiah" id="edit_show_hadiah" value="1" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-[#C5A880] transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5 relative"></div>
+                            <span id="edit_hadiah_label" class="text-xs font-bold text-gray-500 min-w-[32px]">Mati</span>
+                        </label>
+                    </div>
+                </div>
                 <div class="flex gap-3 pt-4 border-t border-[#e8e1d5]">
                     <button type="button" onclick="closeEditModal()" class="flex-1 py-3 bg-white border border-[#e8e1d5] text-[#8d6e63] rounded-xl font-bold text-sm">Batal</button>
                     <button type="submit" name="edit_mempelai" class="flex-1 py-3 bg-[#C5A880] text-white rounded-xl font-bold text-sm shadow-lg flex items-center justify-center gap-1">
@@ -365,12 +394,16 @@ $total_mempelai=mysqli_num_rows($users);
     }
 
     function openEditModal(data) {
-        let [id, nama, user, limit, postId] = data;
+        let [id, nama, user, limit, postId, showHadiah] = data;
         document.getElementById('edit_id').value = id;
         document.getElementById('edit_nama').value = nama;
         document.getElementById('edit_user').value = user;
         document.getElementById('edit_limit').value = limit;
         document.getElementById('edit_post_id').value = postId;
+        const cb = document.getElementById('edit_show_hadiah');
+        cb.checked = (showHadiah == 1);
+        document.getElementById('edit_hadiah_label').textContent = cb.checked ? 'Aktif' : 'Mati';
+        document.getElementById('edit_hadiah_label').className = 'text-xs font-bold min-w-[32px] ' + (cb.checked ? 'text-[#C5A880]' : 'text-gray-400');
         document.getElementById('editModal').classList.remove('hidden');
         document.body.classList.add('modal-active');
     }
@@ -379,6 +412,20 @@ $total_mempelai=mysqli_num_rows($users);
         document.getElementById('editModal').classList.add('hidden');
         document.body.classList.remove('modal-active');
     }
+
+    // Real-time label update untuk toggle di modal Edit
+    document.getElementById('edit_show_hadiah').addEventListener('change', function() {
+        const lbl = document.getElementById('edit_hadiah_label');
+        lbl.textContent = this.checked ? 'Aktif' : 'Mati';
+        lbl.className = 'text-xs font-bold min-w-[32px] ' + (this.checked ? 'text-[#C5A880]' : 'text-gray-400');
+    });
+
+    // Real-time label update untuk toggle di form Tambah
+    document.getElementById('add_show_hadiah').addEventListener('change', function() {
+        const lbl = document.getElementById('add_hadiah_label');
+        lbl.textContent = this.checked ? 'Aktif' : 'Mati';
+        lbl.className = 'text-xs font-bold ' + (this.checked ? 'text-[#C5A880]' : 'text-gray-400');
+    });
     </script>
 </body>
 </html>

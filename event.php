@@ -16,6 +16,9 @@ $effective_uid = ($role == 'receptionist' && $parent_id > 0) ? $parent_id : $uid
 // Cek & Update Database (Otomatis Tambah Kolom jika belum ada)
 $check_kat = mysqli_query($koneksi, "SHOW COLUMNS FROM kategori_tamu LIKE 'user_id'");
 if($check_kat && mysqli_num_rows($check_kat) == 0){ mysqli_query($koneksi, "ALTER TABLE kategori_tamu ADD COLUMN user_id INT DEFAULT 1 AFTER id"); }
+// Tambah kolom event_subtitle jika belum ada
+$check_sub = mysqli_query($koneksi, "SHOW COLUMNS FROM events LIKE 'event_subtitle'");
+if($check_sub && mysqli_num_rows($check_sub) == 0){ mysqli_query($koneksi, "ALTER TABLE events ADD COLUMN event_subtitle VARCHAR(100) DEFAULT 'The Wedding Of' AFTER event_name"); }
 // 1. LOGIKA: SET STATUS AKTIF (MULTI SUPPORT)
 // ==========================================
 if (isset($_POST['action']) && isset($_POST['id'])) {
@@ -50,10 +53,11 @@ if (isset($_POST['tambah_event'])) {
         $pesan_err = "Gagal! Kuota event Anda habis (Maks: $limit_kuota). Hubungi Admin.";
     } else {
         // Lanjut Simpan
-        $name = esc($_POST['event_name']);
-        $date = $_POST['event_date'];
-        $loc  = esc($_POST['event_location']);
-        $desc = esc($_POST['deskripsi_acara']); 
+        $name     = esc($_POST['event_name']);
+        $subtitle = esc($_POST['event_subtitle'] ?? 'The Wedding Of');
+        $date     = $_POST['event_date'];
+        $loc      = esc($_POST['event_location']);
+        $desc     = esc($_POST['deskripsi_acara']); 
         
         $nama_logo = ""; 
         if (!empty($_FILES['event_logo']['name'])) {
@@ -67,8 +71,8 @@ if (isset($_POST['tambah_event'])) {
             if($uploaded) $nama_foto = $uploaded;
         }
 
-        $query = "INSERT INTO events (user_id, event_name, event_date, event_location, deskripsi_acara, event_logo, event_photo, status) 
-                  VALUES ('$effective_uid', '$name', '$date', '$loc', '$desc', '$nama_logo', '$nama_foto', 'inactive')";
+        $query = "INSERT INTO events (user_id, event_name, event_subtitle, event_date, event_location, deskripsi_acara, event_logo, event_photo, status) 
+                  VALUES ('$effective_uid', '$name', '$subtitle', '$date', '$loc', '$desc', '$nama_logo', '$nama_foto', 'inactive')";
         
         if(mysqli_query($koneksi, $query)) {
             $pesan = "Event berhasil dibuat!";
@@ -86,13 +90,14 @@ if (isset($_POST['simpan_edit_event'])) {
     
     $cek = mysqli_query($koneksi, "SELECT id FROM events WHERE id=$id_edit" . ($role=='admin'?'':" AND user_id='$effective_uid'"));
     if(mysqli_num_rows($cek) > 0) {
-        $name = esc($_POST['edit_event_name']);
-        $date = $_POST['edit_event_date'];
-        $loc  = esc($_POST['edit_event_location']);
-        $desc = esc($_POST['edit_deskripsi_acara']);
+        $name     = esc($_POST['edit_event_name']);
+        $subtitle = esc($_POST['edit_event_subtitle'] ?? 'The Wedding Of');
+        $date     = $_POST['edit_event_date'];
+        $loc      = esc($_POST['edit_event_location']);
+        $desc     = esc($_POST['edit_deskripsi_acara']);
         
         $q_update = "UPDATE events SET 
-                     event_name='$name', event_date='$date', event_location='$loc', deskripsi_acara='$desc' 
+                     event_name='$name', event_subtitle='$subtitle', event_date='$date', event_location='$loc', deskripsi_acara='$desc' 
                      WHERE id=$id_edit";
         
         if(mysqli_query($koneksi, $q_update)) {
@@ -261,7 +266,10 @@ if ($role == 'admin') {
                             <div><label class="block text-xs font-bold text-[#87714c] uppercase mb-1">Lokasi</label><input type="text" name="event_location" required placeholder="Nama Gedung / Hotel" class="w-full border border-[#e8e1d5] rounded-xl px-4 py-2.5 text-sm bg-[#ffffff]"></div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
+                            <div><label class="block text-xs font-bold text-[#87714c] uppercase mb-1">Label / Subtitle <span class="font-normal normal-case text-gray-400">(contoh: The Wedding Of)</span></label><input type="text" name="event_subtitle" placeholder="The Wedding Of" value="The Wedding Of" class="w-full border border-[#e8e1d5] rounded-xl px-4 py-2.5 text-sm bg-[#ffffff]"></div>
                             <div><label class="block text-xs font-bold text-[#87714c] uppercase mb-1">Tanggal</label><input type="date" name="event_date" required class="w-full border border-[#e8e1d5] rounded-xl px-4 py-2.5 text-sm bg-[#ffffff]"></div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
                             <div><label class="block text-xs font-bold text-[#87714c] uppercase mb-1">Deskripsi (Opsional)</label><input type="text" name="deskripsi_acara" class="w-full border border-[#e8e1d5] rounded-xl px-4 py-2.5 text-sm bg-[#ffffff]" placeholder="Contoh: Mohon doa restu..."></div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
@@ -391,6 +399,7 @@ if ($role == 'admin') {
                         <h3 class="text-lg leading-6 font-bold text-[#000000] mb-4 border-b border-[#e8e1d5] pb-2 font-serif">Edit Detail Acara</h3>
                         <div class="grid grid-cols-1 gap-4">
                             <div><label class="block text-xs font-bold text-[#87714c] uppercase mb-1">Nama Acara</label><input type="text" name="edit_event_name" id="edit_name" required class="w-full border border-[#e8e1d5] rounded-xl px-3 py-2 text-sm bg-[#ffffff]"></div>
+                            <div><label class="block text-xs font-bold text-[#87714c] uppercase mb-1">Label / Subtitle <span class="font-normal normal-case text-gray-400">(misal: The Wedding Of)</span></label><input type="text" name="edit_event_subtitle" id="edit_subtitle" class="w-full border border-[#e8e1d5] rounded-xl px-3 py-2 text-sm bg-[#ffffff]" placeholder="The Wedding Of"></div>
                             <div><label class="block text-xs font-bold text-[#87714c] uppercase mb-1">Tanggal</label><input type="date" name="edit_event_date" id="edit_date" required class="w-full border border-[#e8e1d5] rounded-xl px-3 py-2 text-sm bg-[#ffffff]"></div>
                             <div><label class="block text-xs font-bold text-[#87714c] uppercase mb-1">Lokasi</label><input type="text" name="edit_event_location" id="edit_loc" required class="w-full border border-[#e8e1d5] rounded-xl px-3 py-2 text-sm bg-[#ffffff]"></div>
                             <div><label class="block text-xs font-bold text-[#87714c] uppercase mb-1">Deskripsi</label><textarea name="edit_deskripsi_acara" id="edit_desc" rows="3" class="w-full border border-[#e8e1d5] rounded-xl px-3 py-2 text-sm bg-[#ffffff]"></textarea></div>
@@ -572,9 +581,10 @@ if ($role == 'admin') {
         }
 
         function openEditEvent(data) {
-            let [id, name, date, location, desc] = data;
+            let [id, name, subtitle, date, location, desc] = data;
             document.getElementById('edit_id_event').value = id;
             document.getElementById('edit_name').value = name;
+            document.getElementById('edit_subtitle').value = subtitle;
             document.getElementById('edit_date').value = date;
             document.getElementById('edit_loc').value = location;
             document.getElementById('edit_desc').value = desc;
