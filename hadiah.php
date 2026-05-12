@@ -21,6 +21,16 @@ $swal_script = "";
 if (isset($_POST['hapus_id'])) {
     $id_hapus = (int) $_POST['hapus_id'];
     
+    // Verifikasi kepemilikan (kecuali admin)
+    if ($role != 'admin') {
+        $q_cek_own = mysqli_query($koneksi, "SELECT h.id FROM hadiah h 
+            INNER JOIN users u ON h.wordpress_post_id = u.post_id 
+            WHERE h.id=$id_hapus AND u.id='$effective_uid' LIMIT 1");
+        if (!$q_cek_own || mysqli_num_rows($q_cek_own) == 0) {
+            header("Location: hadiah.php"); exit;
+        }
+    }
+    
     // Ambil file bukti untuk dihapus
     $q_bukti = mysqli_query($koneksi, "SELECT proof_file FROM hadiah WHERE id=$id_hapus");
     if($q_bukti && mysqli_num_rows($q_bukti) > 0) {
@@ -109,7 +119,17 @@ if (isset($_POST['hapus_id'])) {
                         // Cek apakah tabel hadiah ada (jika tidak ada akan di-create oleh koneksi)
                         $cek_tabel = mysqli_query($koneksi, "SHOW TABLES LIKE 'hadiah'");
                         if(mysqli_num_rows($cek_tabel) > 0) {
-                            $q_hadiah = mysqli_query($koneksi, "SELECT * FROM hadiah ORDER BY id DESC"); 
+                            // Filter per user: hanya tampilkan data milik event user yang login
+                            // Admin bisa lihat semua
+                            if ($role == 'admin') {
+                                $q_hadiah = mysqli_query($koneksi, "SELECT * FROM hadiah ORDER BY id DESC");
+                            } else {
+                                // Ambil post_id milik user yang sedang login
+                                $q_postid = mysqli_query($koneksi, "SELECT post_id FROM users WHERE id='$effective_uid' LIMIT 1");
+                                $row_postid = mysqli_fetch_assoc($q_postid);
+                                $my_post_id = (int)($row_postid['post_id'] ?? 0);
+                                $q_hadiah = mysqli_query($koneksi, "SELECT * FROM hadiah WHERE wordpress_post_id='$my_post_id' ORDER BY id DESC");
+                            }
                             
                             if($q_hadiah && mysqli_num_rows($q_hadiah) > 0):
                                 while($row=mysqli_fetch_assoc($q_hadiah)): 
