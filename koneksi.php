@@ -1,28 +1,6 @@
 <?php
 require_once 'tables.php';
-register_shutdown_function(function() {
-    // Jangan tampilkan signature jika respon adalah JSON (untuk AJAX)
-    $is_json = false;
-    foreach (headers_list() as $header) {
-        if (strpos(strtolower($header), 'application/json') !== false) {
-            $is_json = true;
-            break;
-        }
-    }
-    
-    if (!$is_json && (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || $_SERVER['HTTP_X_REQUESTED_WITH'] !== 'XMLHttpRequest')) {
-        echo "\n<!--
-        ============================================================
-        APPLICATION : BUKU TAMU DIGITAL Eksklusif
-        VERSION     : 2.1 Standard Edition
-        LICENSE     : Licensed for Exclusive Use
-        DEVELOPED BY: ACHMAD BUKHORI
-        CONTACT     : WhatsApp (0822 2222 6900)
-        ============================================================
-        Copyright © 2026. All Rights Reserved.
-    -->";
-    }
-});
+
 
 // Matikan exception fatal di PHP 8.1+ agar bisa ditangani manual
 mysqli_report(MYSQLI_REPORT_OFF);
