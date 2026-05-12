@@ -327,7 +327,7 @@ $info_import = !empty($config_global['import_info_text']) ? $config_global['impo
             </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm border border-[#e8e1d5] overflow-hidden min-h-[400px]">
+        <div class="bg-white rounded-xl shadow-sm border border-[#e8e1d5] overflow-visible min-h-[400px]">
             <div class="overflow-x-auto custom-scrollbar pb-4">
                 
                 <table class="w-full text-left border-collapse min-w-[1000px]" id="mainTable">
@@ -384,12 +384,12 @@ $info_import = !empty($config_global['import_info_text']) ? $config_global['impo
                                         </div>
                                     <?php endif; ?>
 
-                                    <div class="relative inline-block text-left z-10">
-                                        <button onclick="toggleRowMenu('share-menu-<?= $row['id'] ?>')" class="w-8 h-8 rounded-xl bg-white border border-[#e8e1d5] text-[#8d6e63] flex items-center justify-center hover:bg-[#fffbf2] hover:text-[#87714c] transition shadow-sm">
+                                    <div class="relative inline-block text-left" style="position:relative;">
+                                        <button onclick="toggleRowMenu('share-menu-<?= $row['id'] ?>', this)" class="w-8 h-8 rounded-xl bg-white border border-[#e8e1d5] text-[#8d6e63] flex items-center justify-center hover:bg-[#fffbf2] hover:text-[#87714c] transition shadow-sm">
                                             <i class="fas fa-cog"></i>
                                         </button>
                                         
-                                        <div id="share-menu-<?= $row['id'] ?>" class="dropdown-menu hidden absolute left-full top-0 ml-2 w-48 bg-white rounded-xl shadow-xl border border-[#e8e1d5] z-50 overflow-hidden text-left">
+                                        <div id="share-menu-<?= $row['id'] ?>" class="dropdown-menu hidden fixed w-48 bg-white rounded-xl shadow-2xl border border-[#e8e1d5] z-[9999] overflow-hidden text-left">
                                             <div class="py-1">
                                                 <a href="<?= $full_invite_link ?>" target="_blank" class="block px-4 py-2.5 text-xs text-[#000000] hover:bg-[#fffbf2] font-medium flex items-center gap-2">
                                                     <i class="fas fa-eye text-[#87714c] w-4 text-center"></i> Lihat Undangan
@@ -546,9 +546,39 @@ $info_import = !empty($config_global['import_info_text']) ? $config_global['impo
             });
         });
 
-        function toggleRowMenu(id) {
-            $('.dropdown-menu').not('#'+id).addClass('hidden'); 
-            $('#'+id).toggleClass('hidden');
+        function toggleRowMenu(id, btn) {
+            const menu = document.getElementById(id);
+            const allMenus = document.querySelectorAll('.dropdown-menu');
+            allMenus.forEach(m => { if(m.id !== id) m.classList.add('hidden'); });
+
+            if(menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+
+                // Smart positioning: hitung posisi tombol gear
+                const rect = btn.getBoundingClientRect();
+                const menuW = 192; // w-48 = 192px
+                const menuH = menu.offsetHeight || 160;
+                const winW = window.innerWidth;
+                const winH = window.innerHeight;
+
+                // Default: di bawah tombol, rata kiri
+                let top = rect.bottom + window.scrollY + 4;
+                let left = rect.left + window.scrollX;
+
+                // Kalau keluar kanan layar → geser ke kiri
+                if (left + menuW > winW - 8) {
+                    left = rect.right + window.scrollX - menuW;
+                }
+                // Kalau keluar bawah layar → tampilkan di atas tombol
+                if (rect.bottom + menuH > winH) {
+                    top = rect.top + window.scrollY - menuH - 4;
+                }
+
+                menu.style.top  = top + 'px';
+                menu.style.left = left + 'px';
+            } else {
+                menu.classList.add('hidden');
+            }
         }
 
         function copyText(text) {
