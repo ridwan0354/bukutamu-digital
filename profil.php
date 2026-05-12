@@ -66,16 +66,7 @@ if (isset($_POST['update_profile'])) {
     $user_data = mysqli_fetch_assoc($query_user);
 ?>
 
-<!--
-    ============================================================
-    APPLICATION : BUKU TAMU DIGITAL Eksklusif
-    VERSION     : 2.1 Standard Edition
-    LICENSE     : Licensed for Exclusive Use
-    DEVELOPED BY: ACHMAD BUKHORI
-    CONTACT     : WhatsApp (0823 2222 6900)
-    ============================================================
-    Copyright © 2026. All Rights Reserved.
--->
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -128,7 +119,7 @@ if (isset($_POST['update_profile'])) {
                             <img src="https://ui-avatars.com/api/?name=<?= urlencode($user_data['nama_lengkap']) ?>&background=87714c&color=fff&size=128" alt="Avatar">
                         </div>
                         <h2 class="font-bold text-xl text-[#1a0f0d]"><?= $user_data['nama_lengkap'] ?></h2>
-                        <p class="text-xs font-bold text-[#87714c] uppercase tracking-widest mt-1"><?= $user_data['role'] ?></p>
+                        <p class="text-xs font-bold text-[#87714c] uppercase tracking-widest mt-1"><?= ['admin' => 'Administrator', 'mempelai' => 'Member', 'receptionist' => 'Resepsionis'][$user_data['role']] ?? 'Member' ?></p>
                         
                         <div class="mt-6 pt-6 border-t border-[#f3e9d8] space-y-3 text-left">
                             <div class="flex items-center gap-3 text-sm">
